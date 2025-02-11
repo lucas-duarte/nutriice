@@ -1,0 +1,7 @@
+{
+  "name": "Nutriice",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
