@@ -1,17 +1,33 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-title>
-      Tab 3
+      Dieta
     </ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Tab 3</ion-title>
-    </ion-toolbar>
-  </ion-header>
 
-  <app-explore-container name="Tab 3 page"></app-explore-container>
+  <ion-card *ngFor="let refeicao of dieta.refeicoes; let i = index">
+    <ion-card-header>
+      <b>{{refeicao.hora}}h - {{refeicao.refeicao}}</b>
+    </ion-card-header>
+    <ion-card-content>
+      <ul>
+        <!-- Divide a descrição e cria uma lista -->
+        <li *ngFor="let item of refeicao.descricao.split(',')" class="mb-2">
+          {{ item.trim() }}
+        </li>
+      </ul>
+    </ion-card-content>
+  </ion-card>
+
 </ion-content>
+
+<ion-fab slot="fixed" vertical="bottom" horizontal="end">
+  <a href="assets/PLANEJAMENTO ALIMENTAR 19 - Lucas.pdf" target="_blank">
+    <ion-fab-button>
+      <ion-icon name="download"></ion-icon>
+    </ion-fab-button>
+  </a>
+</ion-fab>

@@ -1,17 +1,51 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>
-      Tab 1
-    </ion-title>
-  </ion-toolbar>
-</ion-header>
-
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Tab 1</ion-title>
-    </ion-toolbar>
-  </ion-header>
 
-  <app-explore-container name="Tab 1 page"></app-explore-container>
+  <div class="container">
+    <p class="person">
+      <ion-icon name="person" class="me-3" />Lucas Duarte
+    </p>
+    <p class="date">Ultima Bio: 11/22/2025</p>
+    <h1 class="weight">90 Kg</h1>
+    <ion-icon name="scale" class="bio-icon"></ion-icon>
+  </div>
+
+  <ion-card class="mt-5 shadow-none">
+    <ion-card-content>
+      <div class="d-flex justify-content-between align-items-center">
+        <ion-label>IMC</ion-label>
+        <ion-label><b>25%</b></ion-label>
+      </div>
+      <hr>
+      <div class="d-flex justify-content-between align-items-center">
+        <ion-label>Gordura Corporal</ion-label>
+        <ion-label><b>25%</b></ion-label>
+      </div>
+      <hr>
+      <div class="d-flex justify-content-between align-items-center">
+        <ion-label>Massa Muscular</ion-label>
+        <ion-label><b>25%</b></ion-label>
+      </div>
+      <hr>
+      <div class="d-flex justify-content-between align-items-center">
+        <ion-label>Proteina</ion-label>
+        <ion-label><b>25%</b></ion-label>
+      </div>
+      <hr>
+      <div class="d-flex justify-content-between align-items-center">
+        <ion-label>Gordura subcutânea</ion-label>
+        <ion-label><b>25%</b></ion-label>
+      </div>
+      <hr>
+      <div class="d-flex justify-content-between align-items-center">
+        <ion-label>Gordura visceral</ion-label>
+        <ion-label><b>25%</b></ion-label>
+      </div>
+      <hr>
+      <div class="d-flex justify-content-between align-items-center">
+        <ion-label>Idade Metabólica</ion-label>
+        <ion-label><b>25%</b></ion-label>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
 </ion-content>

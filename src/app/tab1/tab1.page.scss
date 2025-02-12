@@ -1,0 +1,76 @@
+.container {
+  position: relative; /* Necessário para posicionar os pseudo-elementos de forma relativa a este elemento */
+  height: 300px;
+  width: 100%;
+  background-color: #1daa9c;
+  border-radius: 0 0 200px 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Outras propriedades que desejar */
+}
+
+/* Usando ::after para criar a camada extra */
+.container::after {
+  content: ""; /* Necessário para gerar o pseudo-elemento */
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 320px;
+  width: 100%;
+  background-color: #1daa9c79;
+  border-radius: 0 0 200px 200px;
+  z-index: -1; /* Coloca esse pseudo-elemento atrás do conteúdo da .container */
+}
+
+h1 {
+  color: white;
+  font-size: 70px;
+}
+
+.container {
+  position: relative; /* Para posicionar o .date de forma absoluta */
+  height: 300px; /* Altura do contêiner, ajuste conforme necessário */
+  display: flex; /* Ativa o Flexbox */
+  flex-direction: column; /* Empilha os itens verticalmente */
+  justify-content: center; /* Centraliza o conteúdo que não estiver em posição absoluta */
+  align-items: center; /* Centraliza horizontalmente */
+}
+
+.container .date {
+  position: absolute; /* Remove o parágrafo do fluxo normal */
+  top: 110px; /* Define a distância do topo (ajuste conforme necessário) */
+  left: 50%;
+  transform: translateX(-50%); /* Centraliza horizontalmente */
+  margin: 0;
+  padding: 0;
+  color: white;
+}
+
+.container .weight {
+  position: absolute; /* Remove o parágrafo do fluxo normal */
+  top: 130px; /* Define a distância do topo (ajuste conforme necessário) */
+  margin: 0;
+}
+
+.container .person {
+  position: absolute; /* Remove o parágrafo do fluxo normal */
+  top: 20px; /* Define a distância do topo (ajuste conforme necessário) */
+  left: 25%;
+  transform: translateX(-50%); /* Centraliza horizontalmente */
+  margin: 0;
+  padding: 0;
+  color: white;
+  font-size: 20px;
+}
+
+.container .bio-icon {
+  position: absolute; /* Remove o parágrafo do fluxo normal */
+  top: 230px; /* Define a distância do topo (ajuste conforme necessário) */
+  left: 50%;
+  transform: translateX(-50%); /* Centraliza horizontalmente */
+  margin: 0;
+  padding: 0;
+  color: white;
+  font-size: 40px;
+}
