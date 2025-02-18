@@ -1,13 +1,13 @@
 import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { Chart, registerables } from 'chart.js';
-import { fadeInAnimation } from 'src/app/core/constants/animations';
+import { fadeInAnimation, fadeOutAnimation } from 'src/app/core/constants/animations';
 import { ChartConfigurationData } from 'src/app/core/interfaces/chart-configuration-data';
 
 @Component({
   selector: 'app-chart',
   templateUrl: './chart.component.html',
   styleUrls: ['./chart.component.scss'],
-  animations: [fadeInAnimation],
+  animations: [fadeInAnimation, fadeOutAnimation],
   standalone: false
 })
 export class ChartComponent implements OnChanges {
@@ -63,6 +63,9 @@ export class ChartComponent implements OnChanges {
             y: {
               grid: {
                 display: false, // Remove as linhas de grade do eixo Y
+              },
+              ticks: {
+                maxTicksLimit: 4, // limita a 5 números no eixo Y
               },
             },
           },

@@ -1,0 +1,11 @@
+@if(busy){
+<div class="load" [style.width]="width" [style.height]="height">
+  <hr [style.background]="firstChildColor" [style.animationDelay]="firstChildDelay" />
+  <hr [style.background]="secondChildColor" [style.animationDelay]="secondChildDelay" />
+  <hr [style.background]="firstChildColor" [style.animationDelay]="thirdChildDelay" />
+  <hr [style.background]="secondChildColor" [style.animationDelay]="lastChildDelay" />
+</div>
+}@else {
+<ng-content></ng-content>
+}
+

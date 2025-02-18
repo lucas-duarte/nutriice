@@ -1,12 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { Dieta } from '../core/interfaces/dieta';
 import { DietaService } from '../core/services/dieta/dieta.service';
+import { fadeInAnimation, fadeOutAnimation } from '../core/constants/animations';
 
 @Component({
   selector: 'app-tab3',
   templateUrl: 'tab3.page.html',
   styleUrls: ['tab3.page.scss'],
   standalone: false,
+  animations: [fadeInAnimation, fadeOutAnimation]
 })
 export class Tab3Page implements OnInit {
 

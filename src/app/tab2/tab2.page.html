@@ -1,13 +1,34 @@
 <ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>
-      Evolução
-    </ion-title>
-  </ion-toolbar>
+  <ion-toolbar style="--background: white; border: none;">
+    <ion-segment value="Recente" style="--background: #f0f0f0; border: none;" (ionChange)="segmentChanged($event)" value="Recente">
+      <ion-segment-button value="Recente" color="primary">
+        <ion-label>Recente</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="Semana">
+        <ion-label>Semana</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="Mês">
+        <ion-label>Mês</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="Ano">
+        <ion-label>Ano</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+    </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-
-
-  <app-chart [chartConfigurationData]="peso" [busy]="busy"/>
+<ion-content [fullscreen]="true">  
+  <app-chart [chartConfigurationData]="peso" [busy]="busy" />
+  <app-chart [chartConfigurationData]="imc" [busy]="busy" />
+  <app-chart [chartConfigurationData]="gorduraCorporal" [busy]="busy" />
+  <app-chart [chartConfigurationData]="aguaCorporal" [busy]="busy" />
+  <app-chart [chartConfigurationData]="massaEsqueletica" [busy]="busy" />
+  <app-chart [chartConfigurationData]="tmb" [busy]="busy" />
+  <app-chart [chartConfigurationData]="massaLivreGordura" [busy]="busy" />
+  <app-chart [chartConfigurationData]="gorduraSubcutanea" [busy]="busy" />
+  <app-chart [chartConfigurationData]="gorduraVisceral" [busy]="busy" />
+  <app-chart [chartConfigurationData]="massaMuscular" [busy]="busy" />
+  <app-chart [chartConfigurationData]="massaOssea" [busy]="busy" />
+  <app-chart [chartConfigurationData]="proteina" [busy]="busy" />
+  <app-chart [chartConfigurationData]="idadeMetabolica" [busy]="busy" />
 </ion-content>

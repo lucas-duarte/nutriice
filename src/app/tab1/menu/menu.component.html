@@ -1,0 +1,56 @@
+<ion-menu type="overlay" content-id="main-content">
+  <ion-header>
+    <ion-toolbar style="--background: white;">
+      <ion-title>{{user.nome}}</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <ion-content style="--background: white !important;">
+
+    <ion-list>
+      <ion-item id="email">
+        <ion-icon name="mail" color="primary"></ion-icon>
+        <ion-label *ngIf="!busy">{{user.email}}</ion-label>
+        <ion-spinner name="dots" *ngIf="busy" />
+        <ion-popover trigger="email" triggerAction="click" [dismissOnSelect]="true">
+          <ng-template>
+            <div class="ion-padding">Email</div>
+          </ng-template>
+        </ion-popover>
+      </ion-item>
+      <ion-item id="dataNascimento">
+        <ion-icon name="calendar" color="primary"></ion-icon>
+        <ion-label *ngIf="!busy">{{user.dataNascimento | date: 'dd/MM/YYYY'}}</ion-label>
+        <ion-spinner name="dots" *ngIf="busy" />
+        <ion-popover trigger="dataNascimento" triggerAction="click" [dismissOnSelect]="true">
+          <ng-template>
+            <div class="ion-padding">Data de Nascimento</div>
+          </ng-template>
+        </ion-popover>
+      </ion-item>
+      <ion-item id="altura">
+        <ion-icon name="body" color="primary"></ion-icon>
+        <ion-label *ngIf="!busy">{{user.altura}}</ion-label>
+        <ion-spinner name="dots" *ngIf="busy" />
+        <ion-popover trigger="altura" triggerAction="click" [dismissOnSelect]="true">
+          <ng-template>
+            <div class="ion-padding">Altura</div>
+          </ng-template>
+        </ion-popover>
+      </ion-item>
+      <ion-item id="sexo">
+        <ion-icon name="male-female" color="primary"></ion-icon>
+        <ion-label *ngIf="!busy">{{user.sexo}}</ion-label>
+        <ion-spinner name="dots" *ngIf="busy" />
+        <ion-popover trigger="sexo" triggerAction="click" [dismissOnSelect]="true">
+          <ng-template>
+            <div class="ion-padding">Sexo</div>
+          </ng-template>
+        </ion-popover>
+      </ion-item>
+      <ion-item lines="none" routerLink="/login">
+        <ion-icon name="exit-outline" color="secondary"></ion-icon>
+        <ion-label>Sair</ion-label>
+      </ion-item>
+    </ion-list>
+  </ion-content>
+</ion-menu>

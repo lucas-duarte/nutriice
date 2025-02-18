@@ -17,8 +17,8 @@ export class DietaService {
   
       dietas.push(
         {
-          "dia": index,
-          "exercicio": "20 min de aeróbico",
+          "email": "",
+          "descricao": "20 min de aeróbico",
           "status": ((index < diaAtual) ? "concluido" : (index == diaAtual) ? "atual" : (index <= diaAtual + 5) ? "preview" : "bloqueado"),
           "refeicoes": [
             { "index": 1, "hora": "07:00" ,"refeicao": "Café da manhã (pré-treino)",   "descricao": "30g Paçoca de rolha / pasta de amendoim pura, 200g Omelete/ ovo mexido/ ovo cozido, 60ml Café/ chá natural/ suco natural (com adoçante)" },

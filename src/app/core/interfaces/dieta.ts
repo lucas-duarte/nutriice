@@ -1,9 +1,8 @@
 import { Refeicao } from "./refeicao"
 
 export interface Dieta {
-  dia: number
-  exercicio: string
-  status: string,
+  email: string
+  descricao: string
   refeicoes: Refeicao[]
 }
 

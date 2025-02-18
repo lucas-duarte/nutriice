@@ -1,5 +1,14 @@
+@if(busy){
 
-  <ion-card *ngIf="!busy" [@fadeIn] class="m-0 p-2 m-2">
-    <h4>{{chartConfigurationData.titleChart}}</h4>
-    <canvas [id]="chartConfigurationData.nameChart"></canvas>
-  </ion-card>
+  <ion-skeleton-text [animated]="true" style="height: 233px;" />
+
+} @else {
+
+<ion-card [@fadeIn] class="m-0 p-2 mb-2 border rounded-0 shadow-none" [@fadeIn] [@fadeOut]>
+  <div class="d-flex justify-content-between">
+    <p>{{chartConfigurationData.titleChart}}</p>
+    <p>{{chartConfigurationData.datas[chartConfigurationData.datas.length - 1]}}</p>
+  </div>
+  <canvas [id]="chartConfigurationData.nameChart"></canvas>
+</ion-card>
+}

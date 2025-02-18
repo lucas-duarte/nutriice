@@ -1,51 +1,104 @@
-<ion-content [fullscreen]="true">
+<app-menu [user]="user" [busy]="busy"/>
+<ion-content [fullscreen]="true" id="main-content">
+
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content [style.background]="'#1daa9c'"></ion-refresher-content>
+  </ion-refresher>
 
   <div class="container">
     <p class="person">
-      <ion-icon name="person" class="me-3" />Lucas Duarte
+      <ion-menu-toggle>
+        <ion-icon name="person" class="me-3" />{{user.nome}}
+      </ion-menu-toggle>
     </p>
-    <p class="date">Ultima Bio: 11/22/2025</p>
-    <h1 class="weight">90 Kg</h1>
-    <ion-icon name="scale" class="bio-icon"></ion-icon>
+
+    <app-loading [busy]="busy">
+      <div class="d-flex justify-content-center">
+        <p class="date">Ultima Bio: {{bioimpedancia.dataBio | date: 'dd/MM/yyyy'}}</p>
+        <h1 class="weight">{{bioimpedancia.peso}} Kg</h1>
+        <ion-icon name="scale" class="bio-icon"></ion-icon>
+      </div>
+    </app-loading>
+
   </div>
 
-  <ion-card class="mt-5 shadow-none">
+  <ion-card class="mt-5 shadow-none" [@fadeIn] [@fadeOut]>
     <ion-card-content>
       <div class="d-flex justify-content-between align-items-center">
         <ion-label>IMC</ion-label>
-        <ion-label><b>25%</b></ion-label>
+        <ion-spinner name="dots" *ngIf="busy" />
+        <ion-label *ngIf="!busy"><b>{{bioimpedancia.imc}} %</b></ion-label>
       </div>
       <hr>
       <div class="d-flex justify-content-between align-items-center">
         <ion-label>Gordura Corporal</ion-label>
-        <ion-label><b>25%</b></ion-label>
+        <ion-spinner name="dots" *ngIf="busy" />
+        <ion-label *ngIf="!busy"><b>{{bioimpedancia.gorduraCorporal}} %</b></ion-label>
+
       </div>
       <hr>
       <div class="d-flex justify-content-between align-items-center">
-        <ion-label>Massa Muscular</ion-label>
-        <ion-label><b>25%</b></ion-label>
+        <ion-label>Água Corporal</ion-label>
+        <ion-spinner name="dots" *ngIf="busy" />
+        <ion-label *ngIf="!busy"><b>{{bioimpedancia.aguaCorporal}} %</b></ion-label>
+
       </div>
       <hr>
       <div class="d-flex justify-content-between align-items-center">
-        <ion-label>Proteina</ion-label>
-        <ion-label><b>25%</b></ion-label>
+        <ion-label>Massa Esquelética</ion-label>
+        <ion-spinner name="dots" *ngIf="busy" />
+        <ion-label *ngIf="!busy"><b>{{bioimpedancia.massaEsqueletica}} %</b></ion-label>
+
       </div>
       <hr>
       <div class="d-flex justify-content-between align-items-center">
-        <ion-label>Gordura subcutânea</ion-label>
-        <ion-label><b>25%</b></ion-label>
+        <ion-label>TMB</ion-label>
+        <ion-spinner name="dots" *ngIf="busy" />
+        <ion-label *ngIf="!busy"><b>{{bioimpedancia.tmb}}(Kcal)</b></ion-label>
+
+      </div>
+      <hr>
+      <div class="d-flex justify-content-between align-items-center">
+        <ion-label>Gordura Subcutanea</ion-label>
+        <ion-spinner name="dots" *ngIf="busy" />
+        <ion-label *ngIf="!busy"><b>{{bioimpedancia.gorduraSubcutanea}} %</b></ion-label>
+
       </div>
       <hr>
       <div class="d-flex justify-content-between align-items-center">
         <ion-label>Gordura visceral</ion-label>
-        <ion-label><b>25%</b></ion-label>
+        <ion-spinner name="dots" *ngIf="busy" />
+        <ion-label *ngIf="!busy"><b>{{bioimpedancia.gorduraVisceral}}</b></ion-label>
+
+      </div>
+      <hr>
+      <div class="d-flex justify-content-between align-items-center">
+        <ion-label>Massa Muscular</ion-label>
+        <ion-spinner name="dots" *ngIf="busy" />
+        <ion-label *ngIf="!busy"><b>{{bioimpedancia.massaMuscular}} Kg</b></ion-label>
+
+      </div>
+      <hr>
+      <div class="d-flex justify-content-between align-items-center">
+        <ion-label>Massa Óssea</ion-label>
+        <ion-spinner name="dots" *ngIf="busy" />
+        <ion-label *ngIf="!busy"><b>{{bioimpedancia.massaOssea}} %</b></ion-label>
+
+      </div>
+      <hr>
+      <div class="d-flex justify-content-between align-items-center">
+        <ion-label>Proteína</ion-label>
+        <ion-spinner name="dots" *ngIf="busy" />
+        <ion-label *ngIf="!busy"><b>{{bioimpedancia.proteina}} %</b></ion-label>
+
       </div>
       <hr>
       <div class="d-flex justify-content-between align-items-center">
         <ion-label>Idade Metabólica</ion-label>
-        <ion-label><b>25%</b></ion-label>
+        <ion-spinner name="dots" *ngIf="busy" />
+        <ion-label *ngIf="!busy"><b>{{bioimpedancia.idadeMetabolica}} %</b></ion-label>
+
       </div>
     </ion-card-content>
   </ion-card>
-
 </ion-content>
