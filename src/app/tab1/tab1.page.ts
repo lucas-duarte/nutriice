@@ -17,6 +17,7 @@ export class Tab1Page implements OnInit {
   user: User = {} as User;
   bioimpedancia: Bioimpedancia = {} as Bioimpedancia;
   busy: boolean = true;
+  busyUser: boolean = true;
 
   constructor(private bioimpedanciaService: BioimpedanciaService, private userService: UserService) { }
 
@@ -54,15 +55,15 @@ export class Tab1Page implements OnInit {
 
 
   getUser() {
-    this.busy = true;
+    this.busyUser = true;
     this.userService.getUserByEmail().subscribe({
       next: (response) => {
         this.user = response[0];
         console.log(response)
-        this.busy = false;
+        this.busyUser = false;
       },
       error: () => {
-        this.busy = false;
+        this.busyUser = false;
       }
     })
   }

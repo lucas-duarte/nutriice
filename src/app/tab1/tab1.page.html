@@ -1,12 +1,12 @@
-<app-menu [user]="user" [busy]="busy"/>
+<app-menu [user]="user" [busy]="busyUser"/>
 <ion-content [fullscreen]="true" id="main-content">
 
-  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+  <!-- <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
     <ion-refresher-content [style.background]="'#1daa9c'"></ion-refresher-content>
-  </ion-refresher>
+  </ion-refresher> -->
 
   <div class="container">
-    <p class="person">
+    <p class="person" *ngIf="!busyUser">
       <ion-menu-toggle>
         <ion-icon name="person" class="me-3" />{{user.nome}}
       </ion-menu-toggle>
