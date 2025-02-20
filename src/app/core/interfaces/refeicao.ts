@@ -1,6 +1,8 @@
 export interface Refeicao {
+    id: number
+    dietaId: number
     index: number
-    refeicao: string
+    nomeRefeicao: string
     descricao: string
     hora: string
 }

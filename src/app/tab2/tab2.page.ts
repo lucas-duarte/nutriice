@@ -154,7 +154,7 @@ export class Tab2Page implements OnInit {
 
     this.bioimpedanciaService.getAll().subscribe({
       next: (response) => {
-        this.bioimpedancias = response
+        this.bioimpedancias = response.result
         this.generateCharts();
         this.busy = false;
       },

@@ -8,9 +8,9 @@
 
 <ion-content [fullscreen]="true">
 
-  <ion-card *ngFor="let refeicao of dieta.refeicoes; let i = index" class="shadow-none" [@fadeIn] [@fadeOut]>
+  <ion-card *ngFor="let refeicao of refeicoes; let i = index" class="shadow-none" [@fadeIn] [@fadeOut]>
     <ion-card-header>
-      <b>{{refeicao.hora}}h - {{refeicao.refeicao}}</b>
+      <b>{{refeicao.hora}}h - {{refeicao.nomeRefeicao}}</b>
     </ion-card-header>
     <ion-card-content>
       <ul>

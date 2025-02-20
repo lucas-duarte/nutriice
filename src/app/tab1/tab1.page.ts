@@ -4,6 +4,7 @@ import { User } from '../core/interfaces/user';
 import { fadeInAnimation, fadeOutAnimation } from '../core/constants/animations';
 import { BioimpedanciaService } from '../core/services/bioimpedancia/bioimpedancia.service';
 import { UserService } from '../core/services/user/user.service';
+import { HttpParams } from '@angular/common/http';
 
 @Component({
   selector: 'app-tab1',
@@ -29,7 +30,7 @@ export class Tab1Page implements OnInit {
   handleRefresh(event: CustomEvent) {
     this.bioimpedanciaService.getAll().subscribe({
       next: (response) => {
-        this.bioimpedancia = response[0];
+        this.bioimpedancia = response.result[0];
         (event?.target as HTMLIonRefresherElement).complete();
       },
       error: () => {
@@ -44,7 +45,8 @@ export class Tab1Page implements OnInit {
 
     this.bioimpedanciaService.getAll().subscribe({
       next: (response) => {
-        this.bioimpedancia = response[0]
+        console.log(response)
+        this.bioimpedancia = response.result[0]
         this.busy = false;
       },
       error: () => {
@@ -56,9 +58,12 @@ export class Tab1Page implements OnInit {
 
   getUser() {
     this.busyUser = true;
-    this.userService.getUserByEmail().subscribe({
+
+    const params = new HttpParams().set('filter', `eq(Email,'lucasduarte647@gmail.com')`)
+
+    this.userService.getAll(params).subscribe({
       next: (response) => {
-        this.user = response[0];
+        this.user = response.result[0];
         console.log(response)
         this.busyUser = false;
       },

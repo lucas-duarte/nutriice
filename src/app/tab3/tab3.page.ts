@@ -2,6 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { Dieta } from '../core/interfaces/dieta';
 import { DietaService } from '../core/services/dieta/dieta.service';
 import { fadeInAnimation, fadeOutAnimation } from '../core/constants/animations';
+import { RefeicoesService } from '../core/services/refeicoes/refeicoes.service';
+import { Refeicao } from '../core/interfaces/refeicao';
+import { HttpParams } from '@angular/common/http';
 
 @Component({
   selector: 'app-tab3',
@@ -12,9 +15,10 @@ import { fadeInAnimation, fadeOutAnimation } from '../core/constants/animations'
 })
 export class Tab3Page implements OnInit {
 
-  dieta: Dieta = {} as Dieta;  
+  dieta: Dieta = {} as Dieta;
+  refeicoes: Refeicao[] = []
 
-  constructor(private dietaService: DietaService) {}
+  constructor(private dietaService: DietaService, private refeicoesService: RefeicoesService) { }
 
   ngOnInit(): void {
     this.getDietas();
@@ -22,21 +26,32 @@ export class Tab3Page implements OnInit {
 
 
   getDietas(event?: any): void {
-    this.dietaService.getDieta().subscribe({
-      next: (data) => {
-        this.dieta = data[0];
-        console.log(this.dieta)
-        if (event) {
-          setTimeout(() => {
-            event.target.complete();
-          }, 2000);
-        }
+    this.dietaService.getAll().subscribe({
+      next: (response) => {
+        console.log(response)
+        this.dieta = response.result[1];
+        this.getRefeicoes(this.dieta.id)
       },
       error: (error) => {
         console.log(error)
         if (event) {
           event.target.complete();
         }
+      }
+    });
+  }
+
+  getRefeicoes(dietaId: number): void {
+
+    console.log("Chamando")
+    // const params = new HttpParams().set('dietaId', dietaId);
+    this.refeicoesService.getAll(dietaId).subscribe({
+      next: (response) => {
+        console.log(response)
+        this.refeicoes = response.result;
+      },
+      error: (error) => {
+        console.log(error)
       }
     });
   }
