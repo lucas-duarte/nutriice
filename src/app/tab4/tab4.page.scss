@@ -1,0 +1,43 @@
+.figures {
+  display: flex;
+  justify-content: space-around;
+  padding-top: 20px;
+}
+
+.figure {
+  position: relative;
+}
+
+.figure img {
+  width: 200px;
+  height: 400px;
+}
+
+.label {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.8);
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.label ion-icon {
+  margin-right: 4px;
+}
+
+.label.abdomen {
+  top: 150px;
+  left: 210px;
+}
+
+.label.braco {
+  top: 110px;
+  left: -90px;
+}
+
+.label.costas {
+  top: 150px;
+  left: -90px;
+}
