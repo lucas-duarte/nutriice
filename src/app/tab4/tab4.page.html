@@ -1,0 +1,28 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Medidas Corporais</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="figures">
+    <div class="figure">
+      <img src="assets/body-front.svg" alt="Corpo frontal" />
+      <div class="label abdomen">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+        <span>{{ medidas.abdomen }} cm</span>
+      </div>
+      <div class="label braco">
+        <ion-icon name="arrow-forward-outline"></ion-icon>
+        <span>{{ medidas.braco }} cm</span>
+      </div>
+    </div>
+    <div class="figure">
+      <img src="assets/body-back.svg" alt="Costas" />
+      <div class="label costas">
+        <ion-icon name="arrow-forward-outline"></ion-icon>
+        <span>{{ medidas.costas }} %</span>
+      </div>
+    </div>
+  </div>
+</ion-content>
