@@ -75,7 +75,7 @@ export const ListPatientsResponseItem = zod.object({
   objective: zod.string().optional(),
   observations: zod.string().optional(),
   nutritionistId: zod.number(),
-  createdAt: zod.date(),
+  createdAt: zod.string(),
 });
 export const ListPatientsResponse = zod.array(ListPatientsResponseItem);
 
@@ -114,7 +114,7 @@ export const GetPatientResponse = zod.object({
   objective: zod.string().optional(),
   observations: zod.string().optional(),
   nutritionistId: zod.number(),
-  createdAt: zod.date(),
+  createdAt: zod.string(),
 });
 
 /**
@@ -147,7 +147,7 @@ export const UpdatePatientResponse = zod.object({
   objective: zod.string().optional(),
   observations: zod.string().optional(),
   nutritionistId: zod.number(),
-  createdAt: zod.date(),
+  createdAt: zod.string(),
 });
 
 /**
@@ -173,8 +173,8 @@ export const ListPatientDietsResponseItem = zod.object({
   patientId: zod.number(),
   name: zod.string(),
   description: zod.string().optional(),
-  startDate: zod.date().optional(),
-  endDate: zod.date().optional(),
+  startDate: zod.string().optional(),
+  endDate: zod.string().optional(),
   isActive: zod.boolean(),
   totalCalories: zod.number().optional(),
   meals: zod
@@ -205,7 +205,7 @@ export const ListPatientDietsResponseItem = zod.object({
       }),
     )
     .optional(),
-  createdAt: zod.date(),
+  createdAt: zod.string(),
 });
 export const ListPatientDietsResponse = zod.array(ListPatientDietsResponseItem);
 
@@ -216,8 +216,8 @@ export const CreateDietPlanBody = zod.object({
   patientId: zod.number(),
   name: zod.string(),
   description: zod.string().optional(),
-  startDate: zod.date().optional(),
-  endDate: zod.date().optional(),
+  startDate: zod.string().optional(),
+  endDate: zod.string().optional(),
   isActive: zod.boolean().optional(),
 });
 
@@ -233,8 +233,8 @@ export const GetDietPlanResponse = zod.object({
   patientId: zod.number(),
   name: zod.string(),
   description: zod.string().optional(),
-  startDate: zod.date().optional(),
-  endDate: zod.date().optional(),
+  startDate: zod.string().optional(),
+  endDate: zod.string().optional(),
   isActive: zod.boolean(),
   totalCalories: zod.number().optional(),
   meals: zod
@@ -265,7 +265,7 @@ export const GetDietPlanResponse = zod.object({
       }),
     )
     .optional(),
-  createdAt: zod.date(),
+  createdAt: zod.string(),
 });
 
 /**
@@ -278,8 +278,8 @@ export const UpdateDietPlanParams = zod.object({
 export const UpdateDietPlanBody = zod.object({
   name: zod.string().optional(),
   description: zod.string().optional(),
-  startDate: zod.date().optional(),
-  endDate: zod.date().optional(),
+  startDate: zod.string().optional(),
+  endDate: zod.string().optional(),
   isActive: zod.boolean().optional(),
 });
 
@@ -288,8 +288,8 @@ export const UpdateDietPlanResponse = zod.object({
   patientId: zod.number(),
   name: zod.string(),
   description: zod.string().optional(),
-  startDate: zod.date().optional(),
-  endDate: zod.date().optional(),
+  startDate: zod.string().optional(),
+  endDate: zod.string().optional(),
   isActive: zod.boolean(),
   totalCalories: zod.number().optional(),
   meals: zod
@@ -320,7 +320,7 @@ export const UpdateDietPlanResponse = zod.object({
       }),
     )
     .optional(),
-  createdAt: zod.date(),
+  createdAt: zod.string(),
 });
 
 /**
@@ -466,12 +466,12 @@ export const ListAppointmentsResponseItem = zod.object({
   patientId: zod.number(),
   nutritionistId: zod.number(),
   patientName: zod.string().optional(),
-  scheduledAt: zod.date(),
+  scheduledAt: zod.string(),
   durationMinutes: zod.number().optional(),
   status: zod.enum(["pending", "confirmed", "cancelled", "completed"]),
   type: zod.enum(["initial", "followup", "online", "inperson"]),
   notes: zod.string().optional(),
-  createdAt: zod.date(),
+  createdAt: zod.string(),
 });
 export const ListAppointmentsResponse = zod.array(ListAppointmentsResponseItem);
 
@@ -480,7 +480,7 @@ export const ListAppointmentsResponse = zod.array(ListAppointmentsResponseItem);
  */
 export const CreateAppointmentBody = zod.object({
   patientId: zod.number(),
-  scheduledAt: zod.date(),
+  scheduledAt: zod.string(),
   durationMinutes: zod.number().optional(),
   type: zod.enum(["initial", "followup", "online", "inperson"]),
   notes: zod.string().optional(),
@@ -498,12 +498,12 @@ export const GetAppointmentResponse = zod.object({
   patientId: zod.number(),
   nutritionistId: zod.number(),
   patientName: zod.string().optional(),
-  scheduledAt: zod.date(),
+  scheduledAt: zod.string(),
   durationMinutes: zod.number().optional(),
   status: zod.enum(["pending", "confirmed", "cancelled", "completed"]),
   type: zod.enum(["initial", "followup", "online", "inperson"]),
   notes: zod.string().optional(),
-  createdAt: zod.date(),
+  createdAt: zod.string(),
 });
 
 /**
@@ -514,7 +514,7 @@ export const UpdateAppointmentParams = zod.object({
 });
 
 export const UpdateAppointmentBody = zod.object({
-  scheduledAt: zod.date().optional(),
+  scheduledAt: zod.string().optional(),
   durationMinutes: zod.number().optional(),
   status: zod
     .enum(["pending", "confirmed", "cancelled", "completed"])
@@ -528,12 +528,12 @@ export const UpdateAppointmentResponse = zod.object({
   patientId: zod.number(),
   nutritionistId: zod.number(),
   patientName: zod.string().optional(),
-  scheduledAt: zod.date(),
+  scheduledAt: zod.string(),
   durationMinutes: zod.number().optional(),
   status: zod.enum(["pending", "confirmed", "cancelled", "completed"]),
   type: zod.enum(["initial", "followup", "online", "inperson"]),
   notes: zod.string().optional(),
-  createdAt: zod.date(),
+  createdAt: zod.string(),
 });
 
 /**
@@ -562,7 +562,7 @@ export const GetPatientProfileResponse = zod.object({
   objective: zod.string().optional(),
   observations: zod.string().optional(),
   nutritionistId: zod.number(),
-  createdAt: zod.date(),
+  createdAt: zod.string(),
 });
 
 /**
@@ -573,8 +573,8 @@ export const GetMyDietsResponseItem = zod.object({
   patientId: zod.number(),
   name: zod.string(),
   description: zod.string().optional(),
-  startDate: zod.date().optional(),
-  endDate: zod.date().optional(),
+  startDate: zod.string().optional(),
+  endDate: zod.string().optional(),
   isActive: zod.boolean(),
   totalCalories: zod.number().optional(),
   meals: zod
@@ -605,7 +605,7 @@ export const GetMyDietsResponseItem = zod.object({
       }),
     )
     .optional(),
-  createdAt: zod.date(),
+  createdAt: zod.string(),
 });
 export const GetMyDietsResponse = zod.array(GetMyDietsResponseItem);
 
@@ -617,12 +617,12 @@ export const GetMyAppointmentsResponseItem = zod.object({
   patientId: zod.number(),
   nutritionistId: zod.number(),
   patientName: zod.string().optional(),
-  scheduledAt: zod.date(),
+  scheduledAt: zod.string(),
   durationMinutes: zod.number().optional(),
   status: zod.enum(["pending", "confirmed", "cancelled", "completed"]),
   type: zod.enum(["initial", "followup", "online", "inperson"]),
   notes: zod.string().optional(),
-  createdAt: zod.date(),
+  createdAt: zod.string(),
 });
 export const GetMyAppointmentsResponse = zod.array(
   GetMyAppointmentsResponseItem,
