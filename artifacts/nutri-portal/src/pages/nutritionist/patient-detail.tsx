@@ -5,7 +5,7 @@ import { getAuthOptions } from "@/lib/api-helpers";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Edit, Plus, Calendar, Activity, Apple } from "lucide-react";
+import { ArrowLeft, Edit, Plus, Calendar, Activity, Apple, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -157,7 +157,7 @@ export default function PatientDetail() {
                           ${apt.status === 'cancelled' ? 'bg-red-100 text-red-800' : ''}
                           ${apt.status === 'completed' ? 'bg-blue-100 text-blue-800' : ''}
                         `}>
-                          {apt.status}
+                          {apt.status === 'confirmed' ? 'Confirmada' : apt.status === 'pending' ? 'Pendente' : apt.status === 'cancelled' ? 'Cancelada' : 'Concluída'}
                         </span>
                       </div>
                     ))}

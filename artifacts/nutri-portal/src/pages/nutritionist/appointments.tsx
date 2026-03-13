@@ -82,7 +82,7 @@ export default function Appointments() {
                     ${apt.status === 'cancelled' ? 'bg-red-100 text-red-800' : ''}
                     ${apt.status === 'completed' ? 'bg-blue-100 text-blue-800' : ''}
                   `}>
-                    {apt.status}
+                    {apt.status === 'confirmed' ? 'Confirmada' : apt.status === 'pending' ? 'Pendente' : apt.status === 'cancelled' ? 'Cancelada' : 'Concluída'}
                   </span>
                   
                   <Link href={`/patients/${apt.patientId}`}>
