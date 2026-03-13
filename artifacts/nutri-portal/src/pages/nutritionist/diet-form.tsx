@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Loader2, Apple } from "lucide-react";
+import { ArrowLeft, Loader2, Apple, Droplets, FileText } from "lucide-react";
 import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
@@ -17,6 +17,8 @@ import { useQueryClient } from "@tanstack/react-query";
 const dietSchema = z.object({
   name: z.string().min(3, "Nome obrigatório"),
   description: z.string().optional(),
+  recommendations: z.string().optional(),
+  waterGoalMl: z.coerce.number().optional(),
   startDate: z.string().optional(),
   endDate: z.string().optional(),
   isActive: z.boolean().default(true),
@@ -44,12 +46,13 @@ export default function DietForm() {
       const res = await createMutation.mutateAsync({
         data: {
           ...data,
-          patientId
+          patientId,
+          waterGoalMl: data.waterGoalMl || undefined,
         }
       });
       queryClient.invalidateQueries({ queryKey: [`/api/patients/${patientId}/diets`] });
       toast({ title: "Sucesso", description: "Plano alimentar criado. Agora adicione as refeições." });
-      setLocation(`/diets/${res.id}`); // redirect to diet detail to add meals
+      setLocation(`/diets/${res.id}`);
     } catch (error) {
       toast({ title: "Erro ao criar plano", description: extractApiError(error, "Falha ao criar plano alimentar."), variant: "destructive" });
     }
@@ -79,7 +82,39 @@ export default function DietForm() {
 
           <div className="space-y-2">
             <Label htmlFor="description">Descrição / Orientações Gerais</Label>
-            <Textarea id="description" placeholder="Instruções para seguir esta dieta..." className="rounded-xl min-h-[120px]" {...register("description")} />
+            <Textarea id="description" placeholder="Instruções gerais para seguir esta dieta..." className="rounded-xl min-h-[100px]" {...register("description")} />
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <FileText size={16} className="text-primary" />
+              <Label htmlFor="recommendations">Recomendações Nutricionais</Label>
+            </div>
+            <Textarea
+              id="recommendations"
+              placeholder={"Ex: Beber pelo menos 3L de água por dia.\nEvitar alimentos industrializados.\nDormir de 7 a 9 horas por noite.\nPraticar exercício físico regularmente."}
+              className="rounded-xl min-h-[140px]"
+              {...register("recommendations")}
+            />
+            <p className="text-xs text-muted-foreground">Orientações complementares de saúde, sono, hidratação e alimentos permitidos/proibidos.</p>
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <Droplets size={16} className="text-blue-500" />
+              <Label htmlFor="waterGoalMl">Meta de Ingestão Hídrica (ml/dia)</Label>
+            </div>
+            <Input
+              id="waterGoalMl"
+              type="number"
+              placeholder="Ex: 3000"
+              min={500}
+              max={10000}
+              step={100}
+              className="rounded-xl"
+              {...register("waterGoalMl")}
+            />
+            <p className="text-xs text-muted-foreground">Quantidade diária de água recomendada em mililitros. Ex: 3000 = 3 litros.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -94,8 +129,8 @@ export default function DietForm() {
           </div>
 
           <div className="flex justify-end pt-6 border-t border-border/50">
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               className="rounded-xl h-12 px-8 font-semibold shadow-lg shadow-primary/20 hover:-translate-y-0.5 transition-transform"
               disabled={isSubmitting || createMutation.isPending}
             >

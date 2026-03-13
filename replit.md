@@ -94,3 +94,31 @@ Generated React Query hooks and fetch client from the OpenAPI spec (e.g. `useHea
 ### `scripts` (`@workspace/scripts`)
 
 Utility scripts package. Each script is a `.ts` file in `src/` with a corresponding npm script in `package.json`. Run scripts via `pnpm --filter @workspace/scripts run <script>`. Scripts can import any workspace package (e.g., `@workspace/db`) by adding it as a dependency in `scripts/package.json`.
+
+## NutriPlanner — Domain Features
+
+A nutrition management platform with a web portal for nutritionists and a mobile app for patients (all in pt-BR).
+
+### DB schema highlights (`lib/db/src/schema/`)
+
+- `diet_plans` — includes `recommendations` (text), `water_goal_ml` (integer) in addition to base fields
+- `meals` — includes `is_supplement` (boolean) to flag supplements vs regular meals
+- `foods` (jsonb inside meals) — each food item has `name`, `quantity`, `alternatives` (string), plus macros
+
+### Key personas & auth
+
+- Nutritionist login: `lucasduarte647@gmail.com` / `nutriplanner123`
+- JWT in localStorage (web) / AsyncStorage (mobile); roles: `nutritionist` | `patient`
+
+### Portal (`artifacts/nutri-portal`)
+
+React + Vite + Tailwind. Green theme (`#22C55E`). Key pages:
+- `/patients` — list patients
+- `/patients/:id` — patient detail with diet plans and appointments
+- `/patients/:id/diets/new` — create diet plan (includes recommendations + water goal fields)
+- `/diets/:id` — diet detail with meals; shows recommendations card and hydration goal
+- `/diets/:id/meals/new` — add meal (isSupplement toggle + alternatives per food item)
+
+### Mobile app (`artifacts/nutri-app`)
+
+Expo (React Native). Screens: diets list, diet detail (shows water goal, recommendations, supplement badges, food alternatives), appointments, profile.

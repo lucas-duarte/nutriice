@@ -8,6 +8,8 @@ export const dietPlansTable = pgTable("diet_plans", {
   patientId: integer("patient_id").notNull().references(() => patientsTable.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
   description: text("description"),
+  recommendations: text("recommendations"),
+  waterGoalMl: integer("water_goal_ml"),
   startDate: date("start_date"),
   endDate: date("end_date"),
   isActive: boolean("is_active").notNull().default(true),
@@ -25,6 +27,7 @@ export const mealsTable = pgTable("meals", {
   foods: jsonb("foods"),
   calories: real("calories"),
   order: integer("order").notNull().default(0),
+  isSupplement: boolean("is_supplement").notNull().default(false),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 });

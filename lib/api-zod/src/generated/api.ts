@@ -216,6 +216,8 @@ export const CreateDietPlanBody = zod.object({
   patientId: zod.number(),
   name: zod.string(),
   description: zod.string().optional(),
+  recommendations: zod.string().optional(),
+  waterGoalMl: zod.number().optional(),
   startDate: zod.string().optional(),
   endDate: zod.string().optional(),
   isActive: zod.boolean().optional(),
@@ -232,11 +234,13 @@ export const GetDietPlanResponse = zod.object({
   id: zod.number(),
   patientId: zod.number(),
   name: zod.string(),
-  description: zod.string().optional(),
-  startDate: zod.string().optional(),
-  endDate: zod.string().optional(),
+  description: zod.string().optional().nullable(),
+  recommendations: zod.string().optional().nullable(),
+  waterGoalMl: zod.number().optional().nullable(),
+  startDate: zod.string().optional().nullable(),
+  endDate: zod.string().optional().nullable(),
   isActive: zod.boolean(),
-  totalCalories: zod.number().optional(),
+  totalCalories: zod.number().optional().nullable(),
   meals: zod
     .array(
       zod.object({
@@ -246,21 +250,25 @@ export const GetDietPlanResponse = zod.object({
         time: zod
           .string()
           .optional()
+          .nullable()
           .describe('Suggested time, e.g. \"08:00\"'),
-        description: zod.string().optional(),
+        description: zod.string().optional().nullable(),
+        isSupplement: zod.boolean().optional(),
         foods: zod
           .array(
             zod.object({
               name: zod.string(),
               quantity: zod.string(),
-              calories: zod.number().optional(),
-              protein: zod.number().optional(),
-              carbs: zod.number().optional(),
-              fat: zod.number().optional(),
+              alternatives: zod.string().optional().nullable(),
+              calories: zod.number().optional().nullable(),
+              protein: zod.number().optional().nullable(),
+              carbs: zod.number().optional().nullable(),
+              fat: zod.number().optional().nullable(),
             }),
           )
-          .optional(),
-        calories: zod.number().optional(),
+          .optional()
+          .nullable(),
+        calories: zod.number().optional().nullable(),
         order: zod.number(),
       }),
     )
@@ -278,6 +286,8 @@ export const UpdateDietPlanParams = zod.object({
 export const UpdateDietPlanBody = zod.object({
   name: zod.string().optional(),
   description: zod.string().optional(),
+  recommendations: zod.string().optional(),
+  waterGoalMl: zod.number().optional(),
   startDate: zod.string().optional(),
   endDate: zod.string().optional(),
   isActive: zod.boolean().optional(),
@@ -287,11 +297,13 @@ export const UpdateDietPlanResponse = zod.object({
   id: zod.number(),
   patientId: zod.number(),
   name: zod.string(),
-  description: zod.string().optional(),
-  startDate: zod.string().optional(),
-  endDate: zod.string().optional(),
+  description: zod.string().optional().nullable(),
+  recommendations: zod.string().optional().nullable(),
+  waterGoalMl: zod.number().optional().nullable(),
+  startDate: zod.string().optional().nullable(),
+  endDate: zod.string().optional().nullable(),
   isActive: zod.boolean(),
-  totalCalories: zod.number().optional(),
+  totalCalories: zod.number().optional().nullable(),
   meals: zod
     .array(
       zod.object({
@@ -301,21 +313,25 @@ export const UpdateDietPlanResponse = zod.object({
         time: zod
           .string()
           .optional()
+          .nullable()
           .describe('Suggested time, e.g. \"08:00\"'),
-        description: zod.string().optional(),
+        description: zod.string().optional().nullable(),
+        isSupplement: zod.boolean().optional(),
         foods: zod
           .array(
             zod.object({
               name: zod.string(),
               quantity: zod.string(),
-              calories: zod.number().optional(),
-              protein: zod.number().optional(),
-              carbs: zod.number().optional(),
-              fat: zod.number().optional(),
+              alternatives: zod.string().optional().nullable(),
+              calories: zod.number().optional().nullable(),
+              protein: zod.number().optional().nullable(),
+              carbs: zod.number().optional().nullable(),
+              fat: zod.number().optional().nullable(),
             }),
           )
-          .optional(),
-        calories: zod.number().optional(),
+          .optional()
+          .nullable(),
+        calories: zod.number().optional().nullable(),
         order: zod.number(),
       }),
     )
@@ -345,21 +361,24 @@ export const ListDietMealsResponseItem = zod.object({
   id: zod.number(),
   dietPlanId: zod.number(),
   name: zod.string(),
-  time: zod.string().optional().describe('Suggested time, e.g. \"08:00\"'),
-  description: zod.string().optional(),
+  time: zod.string().optional().nullable().describe('Suggested time, e.g. \"08:00\"'),
+  description: zod.string().optional().nullable(),
+  isSupplement: zod.boolean().optional(),
   foods: zod
     .array(
       zod.object({
         name: zod.string(),
         quantity: zod.string(),
-        calories: zod.number().optional(),
-        protein: zod.number().optional(),
-        carbs: zod.number().optional(),
-        fat: zod.number().optional(),
+        alternatives: zod.string().optional().nullable(),
+        calories: zod.number().optional().nullable(),
+        protein: zod.number().optional().nullable(),
+        carbs: zod.number().optional().nullable(),
+        fat: zod.number().optional().nullable(),
       }),
     )
-    .optional(),
-  calories: zod.number().optional(),
+    .optional()
+    .nullable(),
+  calories: zod.number().optional().nullable(),
   order: zod.number(),
 });
 export const ListDietMealsResponse = zod.array(ListDietMealsResponseItem);
@@ -373,21 +392,24 @@ export const AddMealToDietParams = zod.object({
 
 export const AddMealToDietBody = zod.object({
   name: zod.string(),
-  time: zod.string().optional(),
-  description: zod.string().optional(),
+  time: zod.string().optional().nullable(),
+  description: zod.string().optional().nullable(),
+  isSupplement: zod.boolean().optional(),
   foods: zod
     .array(
       zod.object({
         name: zod.string(),
         quantity: zod.string(),
-        calories: zod.number().optional(),
-        protein: zod.number().optional(),
-        carbs: zod.number().optional(),
-        fat: zod.number().optional(),
+        alternatives: zod.string().optional().nullable(),
+        calories: zod.number().optional().nullable(),
+        protein: zod.number().optional().nullable(),
+        carbs: zod.number().optional().nullable(),
+        fat: zod.number().optional().nullable(),
       }),
     )
-    .optional(),
-  calories: zod.number().optional(),
+    .optional()
+    .nullable(),
+  calories: zod.number().optional().nullable(),
   order: zod.number(),
 });
 
@@ -400,21 +422,24 @@ export const UpdateMealParams = zod.object({
 
 export const UpdateMealBody = zod.object({
   name: zod.string().optional(),
-  time: zod.string().optional(),
-  description: zod.string().optional(),
+  time: zod.string().optional().nullable(),
+  description: zod.string().optional().nullable(),
+  isSupplement: zod.boolean().optional(),
   foods: zod
     .array(
       zod.object({
         name: zod.string(),
         quantity: zod.string(),
-        calories: zod.number().optional(),
-        protein: zod.number().optional(),
-        carbs: zod.number().optional(),
-        fat: zod.number().optional(),
+        alternatives: zod.string().optional().nullable(),
+        calories: zod.number().optional().nullable(),
+        protein: zod.number().optional().nullable(),
+        carbs: zod.number().optional().nullable(),
+        fat: zod.number().optional().nullable(),
       }),
     )
-    .optional(),
-  calories: zod.number().optional(),
+    .optional()
+    .nullable(),
+  calories: zod.number().optional().nullable(),
   order: zod.number().optional(),
 });
 
@@ -422,21 +447,24 @@ export const UpdateMealResponse = zod.object({
   id: zod.number(),
   dietPlanId: zod.number(),
   name: zod.string(),
-  time: zod.string().optional().describe('Suggested time, e.g. \"08:00\"'),
-  description: zod.string().optional(),
+  time: zod.string().optional().nullable().describe('Suggested time, e.g. \"08:00\"'),
+  description: zod.string().optional().nullable(),
+  isSupplement: zod.boolean().optional(),
   foods: zod
     .array(
       zod.object({
         name: zod.string(),
         quantity: zod.string(),
-        calories: zod.number().optional(),
-        protein: zod.number().optional(),
-        carbs: zod.number().optional(),
-        fat: zod.number().optional(),
+        alternatives: zod.string().optional().nullable(),
+        calories: zod.number().optional().nullable(),
+        protein: zod.number().optional().nullable(),
+        carbs: zod.number().optional().nullable(),
+        fat: zod.number().optional().nullable(),
       }),
     )
-    .optional(),
-  calories: zod.number().optional(),
+    .optional()
+    .nullable(),
+  calories: zod.number().optional().nullable(),
   order: zod.number(),
 });
 

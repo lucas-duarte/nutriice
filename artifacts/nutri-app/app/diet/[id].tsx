@@ -18,13 +18,19 @@ import Colors from "@/constants/colors";
 
 const C = Colors.light;
 
-function FoodRow({ food }: { food: FoodItem }) {
+function FoodRow({ food }: { food: FoodItem & { alternatives?: string | null } }) {
   return (
     <View style={styles.foodRow}>
       <View style={styles.foodDot} />
       <View style={styles.foodInfo}>
         <Text style={styles.foodName}>{food.name}</Text>
         <Text style={styles.foodQty}>{food.quantity}</Text>
+        {food.alternatives ? (
+          <Text style={styles.foodAlternatives}>
+            <Text style={styles.foodAltLabel}>Alt: </Text>
+            {food.alternatives}
+          </Text>
+        ) : null}
       </View>
       {food.calories ? (
         <Text style={styles.foodCals}>{food.calories} kcal</Text>
@@ -33,17 +39,25 @@ function FoodRow({ food }: { food: FoodItem }) {
   );
 }
 
-function MealCard({ meal }: { meal: Meal }) {
+function MealCard({ meal }: { meal: Meal & { isSupplement?: boolean } }) {
   const totalCals = meal.foods?.reduce((s, f) => s + (f.calories ?? 0), 0) ?? meal.calories ?? 0;
+  const isSupp = meal.isSupplement === true;
 
   return (
-    <View style={styles.mealCard}>
+    <View style={[styles.mealCard, isSupp && styles.mealCardSupp]}>
       <View style={styles.mealHeader}>
-        <View style={styles.mealTimeTag}>
-          <Feather name="clock" size={12} color={C.tintDark} />
-          <Text style={styles.mealTimeText}>{meal.time || "--:--"}</Text>
+        <View style={[styles.mealTimeTag, isSupp && styles.mealTimeTagSupp]}>
+          <Feather name={isSupp ? "package" : "clock"} size={12} color={isSupp ? "#7C3AED" : C.tintDark} />
+          <Text style={[styles.mealTimeText, isSupp && styles.mealTimeTextSupp]}>{meal.time || "--:--"}</Text>
         </View>
-        <Text style={styles.mealOrder}>#{meal.order + 1}</Text>
+        <View style={styles.mealHeaderRight}>
+          {isSupp && (
+            <View style={styles.suppBadge}>
+              <Text style={styles.suppBadgeText}>Suplemento</Text>
+            </View>
+          )}
+          <Text style={styles.mealOrder}>#{meal.order + 1}</Text>
+        </View>
       </View>
 
       <Text style={styles.mealName}>{meal.name}</Text>
@@ -54,9 +68,9 @@ function MealCard({ meal }: { meal: Meal }) {
 
       {meal.foods && meal.foods.length > 0 && (
         <View style={styles.foodsList}>
-          <Text style={styles.foodsTitle}>Alimentos</Text>
+          <Text style={styles.foodsTitle}>{isSupp ? "Suplementos" : "Alimentos"}</Text>
           {meal.foods.map((food, i) => (
-            <FoodRow key={i} food={food} />
+            <FoodRow key={i} food={food as FoodItem & { alternatives?: string | null }} />
           ))}
         </View>
       )}
@@ -87,6 +101,8 @@ export default function DietDetailScreen() {
 
   const topPadding = Platform.OS === "web" ? insets.top + 67 : insets.top;
   const totalCals = diet?.totalCalories || diet?.meals?.reduce((s, m) => s + (m.calories ?? 0), 0) || 0;
+  const waterLiters = (diet as any)?.waterGoalMl ? ((diet as any).waterGoalMl / 1000).toFixed(1) : null;
+  const recommendations = (diet as any)?.recommendations as string | null | undefined;
 
   if (isLoading || !diet) {
     return (
@@ -146,13 +162,38 @@ export default function DietDetailScreen() {
           </View>
         </View>
 
+        {(waterLiters || recommendations) && (
+          <View style={styles.infoSection}>
+            {waterLiters && (
+              <View style={styles.waterCard}>
+                <View style={styles.waterIconWrap}>
+                  <Feather name="droplet" size={20} color="#3B82F6" />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.waterLabel}>Meta de Hidratação</Text>
+                  <Text style={styles.waterValue}>{waterLiters} L/dia</Text>
+                </View>
+              </View>
+            )}
+            {recommendations && (
+              <View style={styles.recoCard}>
+                <View style={styles.recoHeader}>
+                  <Feather name="file-text" size={16} color={C.tintDark} />
+                  <Text style={styles.recoTitle}>Recomendações</Text>
+                </View>
+                <Text style={styles.recoText}>{recommendations}</Text>
+              </View>
+            )}
+          </View>
+        )}
+
         {diet.meals && diet.meals.length > 0 ? (
           <>
             <Text style={styles.sectionTitle}>Refeições</Text>
             {diet.meals
               .sort((a, b) => a.order - b.order)
               .map((meal) => (
-                <MealCard key={meal.id} meal={meal} />
+                <MealCard key={meal.id} meal={meal as Meal & { isSupplement?: boolean }} />
               ))}
           </>
         ) : (
@@ -189,7 +230,7 @@ const styles = StyleSheet.create({
     backgroundColor: C.card,
     borderRadius: 20,
     padding: 20,
-    marginBottom: 24,
+    marginBottom: 16,
     borderWidth: 1,
     borderColor: C.border,
     shadowColor: "#000",
@@ -215,6 +256,36 @@ const styles = StyleSheet.create({
   dietMeta: { flexDirection: "row", flexWrap: "wrap", gap: 16 },
   metaItem: { flexDirection: "row", alignItems: "center", gap: 6 },
   metaText: { fontFamily: "Inter_500Medium", fontSize: 13, color: C.textSecondary },
+  infoSection: { gap: 12, marginBottom: 20 },
+  waterCard: {
+    backgroundColor: "#EFF6FF",
+    borderRadius: 16,
+    padding: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 14,
+    borderWidth: 1,
+    borderColor: "#BFDBFE",
+  },
+  waterIconWrap: {
+    width: 44, height: 44,
+    borderRadius: 12,
+    backgroundColor: "#DBEAFE",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  waterLabel: { fontFamily: "Inter_500Medium", fontSize: 12, color: "#3B82F6", marginBottom: 2 },
+  waterValue: { fontFamily: "Inter_700Bold", fontSize: 20, color: "#1D4ED8" },
+  recoCard: {
+    backgroundColor: C.card,
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: C.border,
+  },
+  recoHeader: { flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 10 },
+  recoTitle: { fontFamily: "Inter_600SemiBold", fontSize: 14, color: C.text },
+  recoText: { fontFamily: "Inter_400Regular", fontSize: 13, color: C.textSecondary, lineHeight: 20 },
   sectionTitle: { fontFamily: "Inter_700Bold", fontSize: 18, color: C.text, marginBottom: 14 },
   mealCard: {
     backgroundColor: C.card,
@@ -229,7 +300,12 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 1,
   },
+  mealCardSupp: {
+    borderLeftWidth: 4,
+    borderLeftColor: "#A78BFA",
+  },
   mealHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 10 },
+  mealHeaderRight: { flexDirection: "row", alignItems: "center", gap: 8 },
   mealTimeTag: {
     flexDirection: "row",
     alignItems: "center",
@@ -239,17 +315,28 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     borderRadius: 10,
   },
+  mealTimeTagSupp: { backgroundColor: "#EDE9FE" },
   mealTimeText: { fontFamily: "Inter_600SemiBold", fontSize: 12, color: C.tintDark },
+  mealTimeTextSupp: { color: "#7C3AED" },
   mealOrder: { fontFamily: "Inter_400Regular", fontSize: 12, color: C.textMuted },
+  suppBadge: {
+    backgroundColor: "#EDE9FE",
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 8,
+  },
+  suppBadgeText: { fontFamily: "Inter_600SemiBold", fontSize: 10, color: "#7C3AED" },
   mealName: { fontFamily: "Inter_700Bold", fontSize: 17, color: C.text, marginBottom: 4 },
   mealDesc: { fontFamily: "Inter_400Regular", fontSize: 13, color: C.textSecondary, marginBottom: 14, lineHeight: 19 },
   foodsList: { marginTop: 8 },
   foodsTitle: { fontFamily: "Inter_600SemiBold", fontSize: 13, color: C.textSecondary, marginBottom: 8, textTransform: "uppercase", letterSpacing: 0.5 },
-  foodRow: { flexDirection: "row", alignItems: "flex-start", marginBottom: 8, gap: 10 },
+  foodRow: { flexDirection: "row", alignItems: "flex-start", marginBottom: 10, gap: 10 },
   foodDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: C.tint, marginTop: 6 },
   foodInfo: { flex: 1 },
   foodName: { fontFamily: "Inter_500Medium", fontSize: 14, color: C.text },
   foodQty: { fontFamily: "Inter_400Regular", fontSize: 12, color: C.textSecondary, marginTop: 1 },
+  foodAlternatives: { fontFamily: "Inter_400Regular", fontSize: 11, color: C.tintDark, marginTop: 3 },
+  foodAltLabel: { fontFamily: "Inter_600SemiBold" },
   foodCals: { fontFamily: "Inter_500Medium", fontSize: 12, color: C.textMuted },
   calsBadge: {
     flexDirection: "row",

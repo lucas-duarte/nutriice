@@ -84,6 +84,8 @@ router.post("/diets", requireAuth, requireNutritionist, async (req, res): Promis
     patientId: parsed.data.patientId,
     name: parsed.data.name,
     description: parsed.data.description ?? null,
+    recommendations: parsed.data.recommendations ?? null,
+    waterGoalMl: parsed.data.waterGoalMl ?? null,
     startDate: parsed.data.startDate ? (parsed.data.startDate as unknown as string) : null,
     endDate: parsed.data.endDate ? (parsed.data.endDate as unknown as string) : null,
     isActive: parsed.data.isActive ?? true,
@@ -127,6 +129,8 @@ router.put("/diets/:id", requireAuth, requireNutritionist, async (req, res): Pro
   const updateData: Record<string, unknown> = {};
   if (parsed.data.name !== undefined) updateData.name = parsed.data.name;
   if (parsed.data.description !== undefined) updateData.description = parsed.data.description;
+  if (parsed.data.recommendations !== undefined) updateData.recommendations = parsed.data.recommendations;
+  if (parsed.data.waterGoalMl !== undefined) updateData.waterGoalMl = parsed.data.waterGoalMl;
   if (parsed.data.startDate !== undefined) updateData.startDate = parsed.data.startDate;
   if (parsed.data.endDate !== undefined) updateData.endDate = parsed.data.endDate;
   if (parsed.data.isActive !== undefined) updateData.isActive = parsed.data.isActive;
@@ -191,6 +195,7 @@ router.post("/diets/:id/meals", requireAuth, requireNutritionist, async (req, re
     foods: parsed.data.foods ?? null,
     calories: parsed.data.calories ?? null,
     order: parsed.data.order ?? 0,
+    isSupplement: parsed.data.isSupplement ?? false,
   }).returning();
 
   res.status(201).json(meal);
@@ -214,6 +219,7 @@ router.put("/meals/:id", requireAuth, requireNutritionist, async (req, res): Pro
   if (parsed.data.name !== undefined) updateData.name = parsed.data.name;
   if (parsed.data.time !== undefined) updateData.time = parsed.data.time;
   if (parsed.data.description !== undefined) updateData.description = parsed.data.description;
+  if (parsed.data.isSupplement !== undefined) updateData.isSupplement = parsed.data.isSupplement;
   if (parsed.data.foods !== undefined) updateData.foods = parsed.data.foods;
   if (parsed.data.calories !== undefined) updateData.calories = parsed.data.calories;
   if (parsed.data.order !== undefined) updateData.order = parsed.data.order;
