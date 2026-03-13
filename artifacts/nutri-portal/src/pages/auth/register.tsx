@@ -73,7 +73,7 @@ export default function Register() {
         >
           <Card className="p-8 shadow-xl shadow-black/5 border-border/50 rounded-2xl">
             <h2 className="text-3xl font-display font-bold mb-2 text-foreground">Crie sua conta</h2>
-            <p className="text-muted-foreground mb-8">Junte-se à NutriPlanner como nutricionista.</p>
+            <p className="text-muted-foreground mb-8">Junte-se à Nutriice como nutricionista.</p>
 
             {errorMsg && (
               <Alert variant="destructive" className="mb-6 rounded-xl">

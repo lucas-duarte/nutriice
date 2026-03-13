@@ -64,7 +64,7 @@ export default function Login() {
             <div className="w-12 h-12 bg-gradient-to-br from-primary to-emerald-600 rounded-xl flex items-center justify-center shadow-lg shadow-primary/25">
               <Leaf className="text-white" size={28} />
             </div>
-            <h1 className="text-4xl font-display font-bold text-foreground">NutriPlanner</h1>
+            <h1 className="text-4xl font-display font-bold text-foreground">Nutriice</h1>
           </div>
 
           <Card className="p-8 shadow-xl shadow-black/5 border-border/50 rounded-2xl bg-white/80 backdrop-blur-sm">

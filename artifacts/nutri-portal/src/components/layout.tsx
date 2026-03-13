@@ -46,7 +46,7 @@ export function DashboardLayout({ children, role }: { children: React.ReactNode,
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-emerald-600 flex items-center justify-center text-white shadow-md shadow-primary/20">
               <Salad size={20} />
             </div>
-            <span className="font-display font-bold text-xl tracking-tight text-foreground">NutriPlanner</span>
+            <span className="font-display font-bold text-xl tracking-tight text-foreground">Nutriice</span>
           </Link>
         </div>
         
@@ -90,7 +90,7 @@ export function DashboardLayout({ children, role }: { children: React.ReactNode,
           <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white">
             <Salad size={20} />
           </div>
-          <span className="font-display font-bold text-lg">NutriPlanner</span>
+          <span className="font-display font-bold text-lg">Nutriice</span>
         </div>
         <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="p-2 text-muted-foreground">
           {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}

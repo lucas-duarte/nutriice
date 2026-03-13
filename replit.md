@@ -95,7 +95,7 @@ Generated React Query hooks and fetch client from the OpenAPI spec (e.g. `useHea
 
 Utility scripts package. Each script is a `.ts` file in `src/` with a corresponding npm script in `package.json`. Run scripts via `pnpm --filter @workspace/scripts run <script>`. Scripts can import any workspace package (e.g., `@workspace/db`) by adding it as a dependency in `scripts/package.json`.
 
-## NutriPlanner — Domain Features
+## Nutriice — Domain Features
 
 A nutrition management platform with a web portal for nutritionists and a mobile app for patients (all in pt-BR).
 
@@ -107,7 +107,7 @@ A nutrition management platform with a web portal for nutritionists and a mobile
 
 ### Key personas & auth
 
-- Nutritionist login: `lucasduarte647@gmail.com` / `nutriplanner123`
+- Nutritionist login: `lucasduarte647@gmail.com` / `nutriice123`
 - JWT in localStorage (web) / AsyncStorage (mobile); roles: `nutritionist` | `patient`
 
 ### Portal (`artifacts/nutri-portal`)

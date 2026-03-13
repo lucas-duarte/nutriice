@@ -67,7 +67,7 @@ export default function LoginScreen() {
           <View style={styles.logoCircle}>
             <Feather name="activity" size={32} color="#FFFFFF" />
           </View>
-          <Text style={styles.appName}>NutriPlanner</Text>
+          <Text style={styles.appName}>Nutriice</Text>
           <Text style={styles.tagline}>Seu plano alimentar na palma da mão</Text>
         </View>
 
