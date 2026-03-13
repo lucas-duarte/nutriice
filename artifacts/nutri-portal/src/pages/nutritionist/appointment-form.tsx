@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useCreateAppointment, useListPatients } from "@workspace/api-client-react";
-import { getAuthOptions } from "@/lib/api-helpers";
+import { getAuthOptions, extractApiError } from "@/lib/api-helpers";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -64,7 +64,7 @@ export default function AppointmentForm() {
       toast({ title: "Agendado", description: "Consulta agendada com sucesso!" });
       setLocation("/appointments");
     } catch (error) {
-      toast({ title: "Erro", description: "Falha ao agendar.", variant: "destructive" });
+      toast({ title: "Erro ao agendar", description: extractApiError(error, "Falha ao agendar consulta."), variant: "destructive" });
     }
   };
 

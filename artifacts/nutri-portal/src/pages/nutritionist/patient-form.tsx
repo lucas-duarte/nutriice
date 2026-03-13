@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useCreatePatient } from "@workspace/api-client-react";
-import { getAuthOptions } from "@/lib/api-helpers";
+import { getAuthOptions, extractApiError } from "@/lib/api-helpers";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -48,7 +48,7 @@ export default function PatientForm() {
       toast({ title: "Sucesso", description: "Paciente cadastrado com sucesso!" });
       setLocation("/patients");
     } catch (error) {
-      toast({ title: "Erro", description: "Falha ao cadastrar paciente.", variant: "destructive" });
+      toast({ title: "Erro ao cadastrar", description: extractApiError(error, "Falha ao cadastrar paciente."), variant: "destructive" });
     }
   };
 

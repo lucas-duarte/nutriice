@@ -3,7 +3,7 @@ import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useAddMealToDiet, useGetDietPlan } from "@workspace/api-client-react";
-import { getAuthOptions } from "@/lib/api-helpers";
+import { getAuthOptions, extractApiError } from "@/lib/api-helpers";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -71,7 +71,7 @@ export default function MealForm() {
       toast({ title: "Sucesso", description: "Refeição adicionada." });
       setLocation(`/diets/${dietId}`);
     } catch (error) {
-      toast({ title: "Erro", description: "Falha ao adicionar refeição.", variant: "destructive" });
+      toast({ title: "Erro ao salvar", description: extractApiError(error, "Falha ao adicionar refeição."), variant: "destructive" });
     }
   };
 

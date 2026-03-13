@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useCreateDietPlan, useGetPatient } from "@workspace/api-client-react";
-import { getAuthOptions } from "@/lib/api-helpers";
+import { getAuthOptions, extractApiError } from "@/lib/api-helpers";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -51,7 +51,7 @@ export default function DietForm() {
       toast({ title: "Sucesso", description: "Plano alimentar criado. Agora adicione as refeições." });
       setLocation(`/diets/${res.id}`); // redirect to diet detail to add meals
     } catch (error) {
-      toast({ title: "Erro", description: "Falha ao criar plano.", variant: "destructive" });
+      toast({ title: "Erro ao criar plano", description: extractApiError(error, "Falha ao criar plano alimentar."), variant: "destructive" });
     }
   };
 
