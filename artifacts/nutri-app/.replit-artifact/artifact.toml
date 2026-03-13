@@ -1,0 +1,27 @@
+kind = "mobile"
+previewPath = "/nutri-app/"
+title = "App do Paciente"
+version = "1.0.0"
+id = "artifacts/nutri-app"
+router = "expo-domain"
+
+[[integratedSkills]]
+name = "expo"
+version = "1.0.0"
+
+[[services]]
+ensurePreviewReachable = "/status"
+localPort = 24329
+name = "expo"
+paths = ["/nutri-app/"]
+
+[services.development]
+run = "pnpm --filter @workspace/nutri-app run dev"
+
+[services.env]
+PORT = "24329"
+BASE_PATH = "/nutri-app/"
+
+[services.production]
+build = ["pnpm", "--filter", "@workspace/nutri-app", "run", "build"]
+run = ["pnpm", "--filter", "@workspace/nutri-app", "run", "serve"]

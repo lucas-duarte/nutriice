@@ -1,0 +1,27 @@
+packages:
+  "framer-motion": "For fluid page transitions and interactive micro-animations"
+  "lucide-react": "Beautiful vector icons for the UI"
+  "react-hook-form": "For robust form state management and validation"
+  "@hookform/resolvers": "Zod resolver for form validation"
+  "zod": "Schema validation for forms matching the backend API"
+  "date-fns": "For elegant date and time formatting"
+  "recharts": "For dashboard statistics and analytics"
+  "clsx": "Utility for constructing className strings conditionally"
+  "tailwind-merge": "Utility to merge tailwind classes without style conflicts"
+
+images:
+  - path: "artifacts/nutri-portal/public/images/logo.png"
+    description: "A premium, minimalist abstract logo mark featuring a geometric leaf or plant shape in vibrant emerald green, transparent background, highly polished"
+    aspect_ratio: "1:1"
+  - path: "artifacts/nutri-portal/public/images/hero-bg.png"
+    description: "Abstract, soft blurred gradient background in fresh mint green, white, and subtle teal. Giving a clean, professional, health-focused and calm atmosphere"
+    aspect_ratio: "16:9"
+  - path: "artifacts/nutri-portal/public/images/auth-side.png"
+    description: "A beautiful, bright, aesthetic flatlay photography of fresh healthy food, avocados, leafy greens, and nuts on a clean white marble background with natural sunlight"
+    aspect_ratio: "9:16"
+
+notes:
+  - Using wouter for routing.
+  - Using generated Orval hooks from @workspace/api-client-react.
+  - Auth token stored in localStorage as 'auth_token'.
+  - Assumes Shadcn UI components are present in src/components/ui.

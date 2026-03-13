@@ -1,22 +1,33 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: API specification for NutriPlanner - Nutritionist and Patient Platform
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: auth
+    description: Authentication operations
+  - name: nutritionists
+    description: Nutritionist operations
+  - name: patients
+    description: Patient operations
+  - name: diets
+    description: Diet plan operations
+  - name: meals
+    description: Meal operations
+  - name: appointments
+    description: Appointment scheduling operations
+
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +35,529 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+        "401":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/register/nutritionist:
+    post:
+      operationId: registerNutritionist
+      tags: [auth]
+      summary: Register a new nutritionist
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterNutritionistRequest"
+      responses:
+        "201":
+          description: Nutritionist registered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/logout:
+    post:
+      operationId: logout
+      tags: [auth]
+      summary: Logout
+      responses:
+        "200":
+          description: Logged out
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+
+  /auth/me:
+    get:
+      operationId: getCurrentUser
+      tags: [auth]
+      summary: Get current user info
+      responses:
+        "200":
+          description: Current user info
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserInfo"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /patients:
+    get:
+      operationId: listPatients
+      tags: [patients]
+      summary: List all patients for the logged-in nutritionist
+      responses:
+        "200":
+          description: List of patients
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Patient"
+    post:
+      operationId: createPatient
+      tags: [patients]
+      summary: Create a new patient
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePatientRequest"
+      responses:
+        "201":
+          description: Patient created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Patient"
+
+  /patients/{id}:
+    get:
+      operationId: getPatient
+      tags: [patients]
+      summary: Get a patient by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Patient details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Patient"
+        "404":
+          description: Patient not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    put:
+      operationId: updatePatient
+      tags: [patients]
+      summary: Update a patient
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdatePatientRequest"
+      responses:
+        "200":
+          description: Patient updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Patient"
+    delete:
+      operationId: deletePatient
+      tags: [patients]
+      summary: Delete a patient
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Patient deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+
+  /patients/{id}/diets:
+    get:
+      operationId: listPatientDiets
+      tags: [diets]
+      summary: List all diet plans for a patient
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of diet plans
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DietPlan"
+
+  /diets:
+    post:
+      operationId: createDietPlan
+      tags: [diets]
+      summary: Create a new diet plan for a patient
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateDietPlanRequest"
+      responses:
+        "201":
+          description: Diet plan created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DietPlan"
+
+  /diets/{id}:
+    get:
+      operationId: getDietPlan
+      tags: [diets]
+      summary: Get a diet plan by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Diet plan details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DietPlan"
+        "404":
+          description: Diet plan not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    put:
+      operationId: updateDietPlan
+      tags: [diets]
+      summary: Update a diet plan
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateDietPlanRequest"
+      responses:
+        "200":
+          description: Diet plan updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DietPlan"
+    delete:
+      operationId: deleteDietPlan
+      tags: [diets]
+      summary: Delete a diet plan
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+
+  /diets/{id}/meals:
+    get:
+      operationId: listDietMeals
+      tags: [meals]
+      summary: List meals in a diet plan
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of meals
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Meal"
+    post:
+      operationId: addMealToDiet
+      tags: [meals]
+      summary: Add a meal to a diet plan
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateMealRequest"
+      responses:
+        "201":
+          description: Meal added
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Meal"
+
+  /meals/{id}:
+    put:
+      operationId: updateMeal
+      tags: [meals]
+      summary: Update a meal
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateMealRequest"
+      responses:
+        "200":
+          description: Meal updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Meal"
+    delete:
+      operationId: deleteMeal
+      tags: [meals]
+      summary: Delete a meal
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+
+  /appointments:
+    get:
+      operationId: listAppointments
+      tags: [appointments]
+      summary: List appointments (nutritionist sees all their appointments; patient sees their own)
+      parameters:
+        - name: patientId
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [pending, confirmed, cancelled, completed]
+      responses:
+        "200":
+          description: List of appointments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Appointment"
+    post:
+      operationId: createAppointment
+      tags: [appointments]
+      summary: Create (request) an appointment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAppointmentRequest"
+      responses:
+        "201":
+          description: Appointment created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Appointment"
+
+  /appointments/{id}:
+    get:
+      operationId: getAppointment
+      tags: [appointments]
+      summary: Get an appointment by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Appointment details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Appointment"
+    put:
+      operationId: updateAppointment
+      tags: [appointments]
+      summary: Update appointment (confirm, cancel, reschedule)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateAppointmentRequest"
+      responses:
+        "200":
+          description: Appointment updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Appointment"
+    delete:
+      operationId: deleteAppointment
+      tags: [appointments]
+      summary: Delete an appointment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+
+  /patient/me:
+    get:
+      operationId: getPatientProfile
+      tags: [patients]
+      summary: Get the logged-in patient's profile
+      responses:
+        "200":
+          description: Patient profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Patient"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /patient/diets:
+    get:
+      operationId: getMyDiets
+      tags: [diets]
+      summary: Get the logged-in patient's diet plans
+      responses:
+        "200":
+          description: Patient's diet plans
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DietPlan"
+
+  /patient/appointments:
+    get:
+      operationId: getMyAppointments
+      tags: [appointments]
+      summary: Get the logged-in patient's appointments
+      responses:
+        "200":
+          description: Patient's appointments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Appointment"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +568,404 @@ components:
       required:
         - status
 
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+
+    MessageResponse:
+      type: object
+      properties:
+        message:
+          type: string
+      required:
+        - message
+
+    LoginRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+      required:
+        - email
+        - password
+
+    LoginResponse:
+      type: object
+      properties:
+        user:
+          $ref: "#/components/schemas/UserInfo"
+        token:
+          type: string
+      required:
+        - user
+        - token
+
+    RegisterNutritionistRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+        crn:
+          type: string
+          description: CRN - Conselho Regional de Nutricionistas
+        phone:
+          type: string
+      required:
+        - name
+        - email
+        - password
+        - crn
+
+    UserInfo:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+          enum: [nutritionist, patient]
+      required:
+        - id
+        - name
+        - email
+        - role
+
+    Patient:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        birthDate:
+          type: string
+          format: date
+        gender:
+          type: string
+          enum: [male, female, other]
+        height:
+          type: number
+          description: Height in cm
+        weight:
+          type: number
+          description: Weight in kg
+        objective:
+          type: string
+        observations:
+          type: string
+        nutritionistId:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - email
+        - nutritionistId
+        - createdAt
+
+    CreatePatientRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        birthDate:
+          type: string
+          format: date
+        gender:
+          type: string
+          enum: [male, female, other]
+        height:
+          type: number
+        weight:
+          type: number
+        objective:
+          type: string
+        observations:
+          type: string
+        password:
+          type: string
+          description: Initial password for patient login
+      required:
+        - name
+        - email
+        - password
+
+    UpdatePatientRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        phone:
+          type: string
+        birthDate:
+          type: string
+          format: date
+        gender:
+          type: string
+          enum: [male, female, other]
+        height:
+          type: number
+        weight:
+          type: number
+        objective:
+          type: string
+        observations:
+          type: string
+
+    DietPlan:
+      type: object
+      properties:
+        id:
+          type: integer
+        patientId:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        isActive:
+          type: boolean
+        totalCalories:
+          type: number
+        meals:
+          type: array
+          items:
+            $ref: "#/components/schemas/Meal"
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - patientId
+        - name
+        - isActive
+        - createdAt
+
+    CreateDietPlanRequest:
+      type: object
+      properties:
+        patientId:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        isActive:
+          type: boolean
+      required:
+        - patientId
+        - name
+
+    UpdateDietPlanRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        isActive:
+          type: boolean
+
+    Meal:
+      type: object
+      properties:
+        id:
+          type: integer
+        dietPlanId:
+          type: integer
+        name:
+          type: string
+        time:
+          type: string
+          description: Suggested time, e.g. "08:00"
+        description:
+          type: string
+        foods:
+          type: array
+          items:
+            $ref: "#/components/schemas/FoodItem"
+        calories:
+          type: number
+        order:
+          type: integer
+      required:
+        - id
+        - dietPlanId
+        - name
+        - order
+
+    CreateMealRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        time:
+          type: string
+        description:
+          type: string
+        foods:
+          type: array
+          items:
+            $ref: "#/components/schemas/FoodItem"
+        calories:
+          type: number
+        order:
+          type: integer
+      required:
+        - name
+        - order
+
+    UpdateMealRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        time:
+          type: string
+        description:
+          type: string
+        foods:
+          type: array
+          items:
+            $ref: "#/components/schemas/FoodItem"
+        calories:
+          type: number
+        order:
+          type: integer
+
+    FoodItem:
+      type: object
+      properties:
+        name:
+          type: string
+        quantity:
+          type: string
+        calories:
+          type: number
+        protein:
+          type: number
+        carbs:
+          type: number
+        fat:
+          type: number
+      required:
+        - name
+        - quantity
+
+    Appointment:
+      type: object
+      properties:
+        id:
+          type: integer
+        patientId:
+          type: integer
+        nutritionistId:
+          type: integer
+        patientName:
+          type: string
+        scheduledAt:
+          type: string
+          format: date-time
+        durationMinutes:
+          type: integer
+        status:
+          type: string
+          enum: [pending, confirmed, cancelled, completed]
+        type:
+          type: string
+          enum: [initial, followup, online, inperson]
+        notes:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - patientId
+        - nutritionistId
+        - scheduledAt
+        - status
+        - type
+        - createdAt
+
+    CreateAppointmentRequest:
+      type: object
+      properties:
+        patientId:
+          type: integer
+        scheduledAt:
+          type: string
+          format: date-time
+        durationMinutes:
+          type: integer
+        type:
+          type: string
+          enum: [initial, followup, online, inperson]
+        notes:
+          type: string
+      required:
+        - patientId
+        - scheduledAt
+        - type
+
+    UpdateAppointmentRequest:
+      type: object
+      properties:
+        scheduledAt:
+          type: string
+          format: date-time
+        durationMinutes:
+          type: integer
+        status:
+          type: string
+          enum: [pending, confirmed, cancelled, completed]
+        type:
+          type: string
+          enum: [initial, followup, online, inperson]
+        notes:
+          type: string
