@@ -39,7 +39,7 @@ export default function Register() {
     setErrorMsg("");
     try {
       const res = await registerMutation.mutateAsync({ data });
-      login(res.token);
+      login(res.token, res.user);
       setLocation("/dashboard");
     } catch (err: any) {
       setErrorMsg("Erro ao criar conta. Verifique os dados e tente novamente.");

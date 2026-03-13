@@ -36,7 +36,7 @@ export default function Login() {
     setErrorMsg("");
     try {
       const res = await loginMutation.mutateAsync({ data });
-      login(res.token);
+      login(res.token, res.user);
       if (res.user.role === "nutritionist") {
         setLocation("/dashboard");
       } else {

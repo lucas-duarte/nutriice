@@ -1,13 +1,12 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { useGetCurrentUser } from "@workspace/api-client-react";
-import { getAuthOptions } from "./api-helpers";
 import type { UserInfo } from "@workspace/api-client-react";
 
 interface AuthContextType {
   user: UserInfo | null;
   isLoading: boolean;
-  login: (token: string) => void;
+  login: (token: string, user: UserInfo) => void;
   logout: () => void;
   isAuthenticated: boolean;
 }
@@ -16,40 +15,46 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [token, setToken] = useState<string | null>(localStorage.getItem("auth_token"));
+  const [cachedUser, setCachedUser] = useState<UserInfo | null>(null);
   const [, setLocation] = useLocation();
 
-  const { data: user, isLoading: isUserLoading, isError, refetch } = useGetCurrentUser({
+  const { data: fetchedUser, isLoading: isUserLoading, isError } = useGetCurrentUser({
     query: {
-      enabled: !!token,
+      enabled: !!token && !cachedUser,
       retry: false,
     },
-    ...getAuthOptions()
+    request: {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    },
   });
 
   useEffect(() => {
     if (isError) {
       localStorage.removeItem("auth_token");
       setToken(null);
+      setCachedUser(null);
       setLocation("/login");
     }
   }, [isError, setLocation]);
 
-  const login = (newToken: string) => {
+  const login = (newToken: string, user: UserInfo) => {
     localStorage.setItem("auth_token", newToken);
     setToken(newToken);
-    refetch();
+    setCachedUser(user);
   };
 
   const logout = () => {
     localStorage.removeItem("auth_token");
     setToken(null);
+    setCachedUser(null);
     setLocation("/login");
   };
 
-  const isLoading = !!token && isUserLoading;
+  const user = cachedUser ?? fetchedUser ?? null;
+  const isLoading = !!token && !user && isUserLoading;
 
   return (
-    <AuthContext.Provider value={{ user: user ?? null, isLoading, login, logout, isAuthenticated: !!token }}>
+    <AuthContext.Provider value={{ user, isLoading, login, logout, isAuthenticated: !!token && !!user }}>
       {children}
     </AuthContext.Provider>
   );
