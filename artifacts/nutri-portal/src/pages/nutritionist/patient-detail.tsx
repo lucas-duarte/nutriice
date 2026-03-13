@@ -32,9 +32,11 @@ export default function PatientDetail() {
           <h1 className="text-3xl font-display font-bold text-foreground">{patient.name}</h1>
           <p className="text-muted-foreground">{patient.email} {patient.phone ? ` • ${patient.phone}` : ''}</p>
         </div>
-        <Button variant="outline" className="rounded-xl bg-white">
-          <Edit size={16} className="mr-2" /> Editar
-        </Button>
+        <Link href={`/patients/${patient.id}/edit`}>
+          <Button variant="outline" className="rounded-xl bg-white">
+            <Edit size={16} className="mr-2" /> Editar
+          </Button>
+        </Link>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
