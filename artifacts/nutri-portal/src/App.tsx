@@ -19,6 +19,8 @@ import DietDetail from "@/pages/nutritionist/diet-detail";
 import MealForm from "@/pages/nutritionist/meal-form";
 import AppointmentsList from "@/pages/nutritionist/appointments";
 import AppointmentForm from "@/pages/nutritionist/appointment-form";
+import PatientBioDashboard from "@/pages/nutritionist/patient-dashboard";
+import BioimpedanceForm from "@/pages/nutritionist/bioimpedance-form";
 
 // Patient Pages
 import PatientDashboard from "@/pages/patient/dashboard";
@@ -79,6 +81,9 @@ function Router() {
       
       <Route path="/appointments"><ProtectedRoute component={AppointmentsList} role="nutritionist" /></Route>
       <Route path="/appointments/new"><ProtectedRoute component={AppointmentForm} role="nutritionist" /></Route>
+
+      <Route path="/patients/:id/dashboard"><ProtectedRoute component={PatientBioDashboard} role="nutritionist" /></Route>
+      <Route path="/patients/:id/bioimpedance/new"><ProtectedRoute component={BioimpedanceForm} role="nutritionist" /></Route>
 
       {/* Patient Routes */}
       <Route path="/patient/dashboard"><ProtectedRoute component={PatientDashboard} role="patient" /></Route>

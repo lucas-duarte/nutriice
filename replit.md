@@ -110,14 +110,26 @@ A nutrition management platform with a web portal for nutritionists and a mobile
 - Nutritionist login: `lucasduarte647@gmail.com` / `nutriice123`
 - JWT in localStorage (web) / AsyncStorage (mobile); roles: `nutritionist` | `patient`
 
+### DB schema highlights (`lib/db/src/schema/`)
+
+- `bioimpedance_records` — patient body composition measurements with 13 indicators: `peso`, `imc`, `gordura_corporal`, `agua_corporal`, `massa_esqueletica`, `tmb`, `massa_livre_gordura`, `gordura_subcutanea`, `gordura_visceral`, `massa_muscular`, `massa_ossea`, `proteina`, `idade_metabolica` + `data_bio` date + `patient_id` FK
+
 ### Portal (`artifacts/nutri-portal`)
 
-React + Vite + Tailwind. Green theme (`#22C55E`). Key pages:
+React + Vite + Tailwind + Recharts. Green theme (`#22C55E`). Key pages:
 - `/patients` — list patients
-- `/patients/:id` — patient detail with diet plans and appointments
+- `/patients/:id` — patient detail with diet plans, appointments, and Bioimpedância button
+- `/patients/:id/dashboard` — bioimpedance dashboard: last measurement cards with trend arrows, line charts for all 13 metrics over time, history table with delete
+- `/patients/:id/bioimpedance/new` — form to register a new bioimpedance measurement (two card sections: main indicators + additional indicators)
 - `/patients/:id/diets/new` — create diet plan (includes recommendations + water goal fields)
 - `/diets/:id` — diet detail with meals; shows recommendations card and hydration goal
 - `/diets/:id/meals/new` — add meal (isSupplement toggle + alternatives per food item)
+
+### API routes for bioimpedance (`artifacts/api-server/src/routes/bioimpedance.ts`)
+
+- `GET /api/patients/:id/bioimpedance` — list all records for a patient (ordered by date desc)
+- `POST /api/patients/:id/bioimpedance` — create new measurement (nutritionist only)
+- `DELETE /api/bioimpedance/:id` — delete a measurement (nutritionist only)
 
 ### Mobile app (`artifacts/nutri-app`)
 

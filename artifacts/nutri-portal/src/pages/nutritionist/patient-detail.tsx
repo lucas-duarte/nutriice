@@ -75,10 +75,17 @@ export default function PatientDetail() {
         <Card className="md:col-span-3 rounded-2xl shadow-sm border-border/50">
           <Tabs defaultValue="diets" className="w-full">
             <CardHeader className="border-b px-6 py-4">
-              <TabsList className="grid w-[400px] grid-cols-2 bg-secondary rounded-xl p-1">
-                <TabsTrigger value="diets" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">Planos Alimentares</TabsTrigger>
-                <TabsTrigger value="appointments" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">Consultas</TabsTrigger>
-              </TabsList>
+              <div className="flex items-center justify-between gap-4">
+                <TabsList className="grid w-[400px] grid-cols-2 bg-secondary rounded-xl p-1">
+                  <TabsTrigger value="diets" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">Planos Alimentares</TabsTrigger>
+                  <TabsTrigger value="appointments" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">Consultas</TabsTrigger>
+                </TabsList>
+                <Link href={`/patients/${patient.id}/dashboard`}>
+                  <Button variant="outline" size="sm" className="rounded-xl border-primary/40 text-primary hover:bg-primary/5 whitespace-nowrap">
+                    <Activity size={15} className="mr-2" /> Bioimpedância
+                  </Button>
+                </Link>
+              </div>
             </CardHeader>
             <CardContent className="p-6 min-h-[400px]">
               
