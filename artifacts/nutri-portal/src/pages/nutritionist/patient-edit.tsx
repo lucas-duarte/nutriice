@@ -1,20 +1,22 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRoute, useLocation } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useGetPatient, useUpdatePatient } from "@workspace/api-client-react";
-import { getAuthOptions, extractApiError } from "@/lib/api-helpers";
+import { getAuthOptions, getAuthReq, extractApiError } from "@/lib/api-helpers";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Loader2, Save } from "lucide-react";
+import { ArrowLeft, Loader2, Save, KeyRound, Eye, EyeOff } from "lucide-react";
 import { Link } from "wouter";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
+
+const BASE = import.meta.env.BASE_URL?.replace(/\/$/, "") || "";
 
 const editSchema = z.object({
   name: z.string().min(3, "Nome obrigatório"),
@@ -41,6 +43,9 @@ export default function PatientEdit() {
   const [, setLocation] = useLocation();
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const [newPassword, setNewPassword] = useState("");
+  const [showNewPw, setShowNewPw] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
 
   const { data: patient, isLoading } = useGetPatient(id, getAuthOptions());
   const updateMutation = useUpdatePatient(getAuthOptions());
@@ -63,6 +68,29 @@ export default function PatientEdit() {
       });
     }
   }, [patient, reset]);
+
+  const handleResetPassword = async () => {
+    if (!newPassword || newPassword.length < 6) {
+      toast({ title: "Senha inválida", description: "A nova senha deve ter pelo menos 6 caracteres.", variant: "destructive" });
+      return;
+    }
+    setIsResetting(true);
+    try {
+      const res = await fetch(`${BASE}/api/patients/${id}/reset-password`, {
+        method: "PUT",
+        ...getAuthReq(),
+        headers: { ...(getAuthReq().headers as Record<string, string>), "Content-Type": "application/json" },
+        body: JSON.stringify({ newPassword }),
+      });
+      if (!res.ok) throw new Error();
+      toast({ title: "Senha redefinida!", description: "A nova senha do paciente foi salva." });
+      setNewPassword("");
+    } catch {
+      toast({ title: "Erro", description: "Falha ao redefinir senha.", variant: "destructive" });
+    } finally {
+      setIsResetting(false);
+    }
+  };
 
   const onSubmit = async (data: FormValues) => {
     try {
@@ -186,6 +214,47 @@ export default function PatientEdit() {
               </div>
             </div>
           </div>
+
+          <Card className="rounded-xl border-amber-200 bg-amber-50/50">
+            <CardHeader className="pb-2 pt-4 px-4">
+              <CardTitle className="text-sm font-semibold text-amber-800 flex items-center gap-2">
+                <KeyRound size={15} />
+                Redefinir senha do paciente
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="px-4 pb-4">
+              <p className="text-xs text-amber-700 mb-3">
+                Use isto se o paciente esqueceu a senha. Defina uma nova senha e informe ao paciente.
+              </p>
+              <div className="flex gap-2">
+                <div className="relative flex-1">
+                  <Input
+                    type={showNewPw ? "text" : "password"}
+                    className="rounded-xl pr-10 h-10 text-sm"
+                    placeholder="Nova senha (mín. 6 caracteres)"
+                    value={newPassword}
+                    onChange={e => setNewPassword(e.target.value)}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowNewPw(v => !v)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  >
+                    {showNewPw ? <EyeOff size={14} /> : <Eye size={14} />}
+                  </button>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="rounded-xl h-10 px-4 border-amber-300 text-amber-800 hover:bg-amber-100"
+                  disabled={isResetting || !newPassword}
+                  onClick={handleResetPassword}
+                >
+                  {isResetting ? <Loader2 size={14} className="animate-spin" /> : "Redefinir"}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
 
           <div className="flex justify-end gap-3 pt-4 border-t border-border/50">
             <Link href={`/patients/${id}`}>

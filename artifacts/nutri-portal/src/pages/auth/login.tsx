@@ -114,7 +114,13 @@ export default function Login() {
               </Button>
             </form>
 
-            <div className="mt-8 text-center text-sm text-muted-foreground">
+            <div className="mt-6 text-center">
+              <Link href="/forgot-password" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                Esqueceu sua senha?
+              </Link>
+            </div>
+
+            <div className="mt-4 text-center text-sm text-muted-foreground">
               É nutricionista e não tem conta?{" "}
               <Link href="/register" className="text-primary font-semibold hover:underline">
                 Cadastre-se

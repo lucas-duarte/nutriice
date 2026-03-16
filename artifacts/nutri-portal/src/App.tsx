@@ -22,6 +22,8 @@ import AppointmentForm from "@/pages/nutritionist/appointment-form";
 import PatientBioDashboard from "@/pages/nutritionist/patient-dashboard";
 import BioimpedanceForm from "@/pages/nutritionist/bioimpedance-form";
 import PatientEdit from "@/pages/nutritionist/patient-edit";
+import ChangePassword from "@/pages/nutritionist/change-password";
+import ForgotPassword from "@/pages/auth/forgot-password";
 
 // Patient Pages
 import PatientDashboard from "@/pages/patient/dashboard";
@@ -69,6 +71,7 @@ function Router() {
       <Route path="/" component={() => <Redirect to="/login" />} />
       <Route path="/login" component={Login} />
       <Route path="/register" component={Register} />
+      <Route path="/forgot-password" component={ForgotPassword} />
 
       {/* Nutritionist Routes */}
       <Route path="/dashboard"><ProtectedRoute component={NutriDashboard} role="nutritionist" /></Route>
@@ -86,6 +89,7 @@ function Router() {
 
       <Route path="/patients/:id/dashboard"><ProtectedRoute component={PatientBioDashboard} role="nutritionist" /></Route>
       <Route path="/patients/:id/bioimpedance/new"><ProtectedRoute component={BioimpedanceForm} role="nutritionist" /></Route>
+      <Route path="/change-password"><ProtectedRoute component={ChangePassword} role="nutritionist" /></Route>
 
       {/* Patient Routes */}
       <Route path="/patient/dashboard"><ProtectedRoute component={PatientDashboard} role="patient" /></Route>
