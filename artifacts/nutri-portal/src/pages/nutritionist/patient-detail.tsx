@@ -212,7 +212,7 @@ export default function PatientDetail() {
                 {isDietsLoading ? (
                   <div className="py-8 text-center"><Loader2 className="animate-spin mx-auto text-primary" /></div>
                 ) : diets && diets.length > 0 ? (
-                  <div className="space-y-4">
+                  <div className="flex flex-col gap-3">
                     {diets.map(diet => (
                       <Link key={diet.id} href={`/diets/${diet.id}`}>
                         <div className="border rounded-xl p-4 hover:border-primary/50 hover:shadow-sm transition-all cursor-pointer flex justify-between items-center bg-card">
