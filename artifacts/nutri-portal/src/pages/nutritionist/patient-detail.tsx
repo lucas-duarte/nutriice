@@ -3,22 +3,103 @@ import { Link } from "wouter";
 import { useEffect, useState } from "react";
 import { useGetPatient, useListPatientDiets, useListAppointments } from "@workspace/api-client-react";
 import { getAuthOptions, getAuthReq } from "@/lib/api-helpers";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Edit, Plus, Calendar, Activity, Apple, Loader2, BarChart2, Scale } from "lucide-react";
+import { ArrowLeft, Edit, Plus, Calendar, Activity, Apple, Loader2, Scale, TrendingUp, TrendingDown, Minus } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import {
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
+} from "recharts";
 
 const BASE = import.meta.env.BASE_URL?.replace(/\/$/, "") || "";
 
 interface BioRecord {
   id: number;
+  patientId: number;
   dataBio: string;
   peso: number | null;
-  gorduraCorporal: number | null;
-  massaMuscular: number | null;
   imc: number | null;
+  gorduraCorporal: number | null;
+  aguaCorporal: number | null;
+  massaEsqueletica: number | null;
+  tmb: number | null;
+  massaLivreGordura: number | null;
+  gorduraSubcutanea: number | null;
+  gorduraVisceral: number | null;
+  massaMuscular: number | null;
+  massaOssea: number | null;
+  proteina: number | null;
+  idadeMetabolica: number | null;
+}
+
+const METRICS: { key: keyof BioRecord; label: string; unit: string; color: string; decimals?: number }[] = [
+  { key: "peso", label: "Peso", unit: "kg", color: "#22C55E" },
+  { key: "imc", label: "IMC", unit: "", color: "#3B82F6", decimals: 1 },
+  { key: "gorduraCorporal", label: "Gordura Corporal", unit: "%", color: "#EF4444" },
+  { key: "massaMuscular", label: "Massa Muscular", unit: "kg", color: "#8B5CF6" },
+  { key: "aguaCorporal", label: "Água Corporal", unit: "%", color: "#06B6D4" },
+  { key: "massaEsqueletica", label: "Massa Esquelética", unit: "kg", color: "#F59E0B" },
+  { key: "tmb", label: "TMB", unit: "kcal", color: "#EC4899" },
+  { key: "massaLivreGordura", label: "Massa Livre de Gordura", unit: "kg", color: "#10B981" },
+  { key: "gorduraSubcutanea", label: "Gordura Subcutânea", unit: "%", color: "#F97316" },
+  { key: "gorduraVisceral", label: "Gordura Visceral", unit: "", color: "#DC2626" },
+  { key: "massaOssea", label: "Massa Óssea", unit: "kg", color: "#6366F1" },
+  { key: "proteina", label: "Proteína", unit: "%", color: "#84CC16" },
+  { key: "idadeMetabolica", label: "Idade Metabólica", unit: "anos", color: "#64748B" },
+];
+
+function Trend({ current, previous }: { current: number | null; previous: number | null }) {
+  if (current === null || previous === null) return null;
+  const diff = current - previous;
+  if (Math.abs(diff) < 0.01) return <Minus size={13} className="text-muted-foreground" />;
+  if (diff > 0) return <TrendingUp size={13} className="text-red-500" />;
+  return <TrendingDown size={13} className="text-green-500" />;
+}
+
+function MetricChart({ metric, records }: { metric: typeof METRICS[0]; records: BioRecord[] }) {
+  const data = [...records]
+    .reverse()
+    .map(r => ({
+      date: format(new Date(r.dataBio + "T12:00:00"), "dd/MM", { locale: ptBR }),
+      value: r[metric.key] as number | null,
+    }))
+    .filter(d => d.value !== null);
+
+  if (data.length < 2) return null;
+
+  return (
+    <Card className="rounded-xl border-border/50 shadow-sm">
+      <div className="px-4 pt-3 pb-1 flex items-center gap-2">
+        <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: metric.color }} />
+        <span className="text-xs font-semibold text-foreground">{metric.label}</span>
+        {metric.unit && <span className="text-xs text-muted-foreground">({metric.unit})</span>}
+      </div>
+      <CardContent className="px-2 pb-3 pt-1">
+        <ResponsiveContainer width="100%" height={100}>
+          <LineChart data={data} margin={{ top: 4, right: 8, bottom: 0, left: -22 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+            <XAxis dataKey="date" tick={{ fontSize: 9 }} />
+            <YAxis tick={{ fontSize: 9 }} />
+            <Tooltip
+              formatter={(v: number) => [`${Number(v).toFixed(metric.decimals ?? 1)} ${metric.unit}`, metric.label]}
+              labelFormatter={(l) => `Data: ${l}`}
+            />
+            <Line
+              type="monotone"
+              dataKey="value"
+              stroke={metric.color}
+              strokeWidth={2}
+              dot={{ r: 3, fill: metric.color }}
+              activeDot={{ r: 5 }}
+              connectNulls
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      </CardContent>
+    </Card>
+  );
 }
 
 export default function PatientDetail() {
@@ -44,6 +125,12 @@ export default function PatientDetail() {
 
   if (isPatientLoading) return <div className="p-12 text-center">Carregando dados do paciente...</div>;
   if (!patient) return <div className="p-12 text-center text-destructive">Paciente não encontrado.</div>;
+
+  const latest = bioRecords[0];
+  const previous = bioRecords[1];
+  const chartsWithData = METRICS.filter(m =>
+    bioRecords.filter(r => r[m.key] !== null).length >= 2
+  );
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto animate-in fade-in duration-300">
@@ -111,7 +198,7 @@ export default function PatientDetail() {
               </div>
             </CardHeader>
             <CardContent className="p-6 min-h-[400px]">
-              
+
               <TabsContent value="diets" className="mt-0 outline-none">
                 <div className="flex justify-between items-center mb-6">
                   <h3 className="text-xl font-semibold flex items-center gap-2"><Apple size={20} className="text-primary"/> Dietas Prescritas</h3>
@@ -200,70 +287,20 @@ export default function PatientDetail() {
               </TabsContent>
 
               <TabsContent value="bioimpedance" className="mt-0 outline-none">
-                <div className="flex justify-between items-center mb-6">
+                <div className="flex justify-between items-center mb-5">
                   <h3 className="text-xl font-semibold flex items-center gap-2">
                     <Scale size={20} className="text-violet-500"/> Bioimpedância
                   </h3>
-                  <div className="flex gap-2">
-                    <Link href={`/patients/${patient.id}/dashboard`}>
-                      <Button size="sm" variant="outline" className="rounded-xl border-violet-300 text-violet-700 hover:bg-violet-50">
-                        <BarChart2 size={15} className="mr-2"/> Ver Gráficos
-                      </Button>
-                    </Link>
-                    <Link href={`/patients/${patient.id}/bioimpedance/new`}>
-                      <Button size="sm" className="rounded-xl bg-violet-600 hover:bg-violet-700 shadow-sm">
-                        <Plus size={16} className="mr-2"/> Novo Registro
-                      </Button>
-                    </Link>
-                  </div>
+                  <Link href={`/patients/${patient.id}/bioimpedance/new`}>
+                    <Button size="sm" className="rounded-xl bg-violet-600 hover:bg-violet-700 shadow-sm">
+                      <Plus size={16} className="mr-2"/> Novo Registro
+                    </Button>
+                  </Link>
                 </div>
 
                 {isBioLoading ? (
                   <div className="py-8 text-center"><Loader2 className="animate-spin mx-auto text-violet-500" /></div>
-                ) : bioRecords.length > 0 ? (
-                  <div className="space-y-3">
-                    {bioRecords.map(rec => (
-                      <div key={rec.id} className="border rounded-xl p-4 flex justify-between items-center bg-card hover:border-violet-200 hover:shadow-sm transition-all">
-                        <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 rounded-full bg-violet-100 flex items-center justify-center">
-                            <Scale size={16} className="text-violet-600"/>
-                          </div>
-                          <div>
-                            <p className="font-semibold text-foreground">
-                              {format(new Date(rec.dataBio + "T00:00:00"), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex gap-6 text-sm text-right">
-                          {rec.peso != null && (
-                            <div>
-                              <p className="text-xs text-muted-foreground">Peso</p>
-                              <p className="font-semibold">{rec.peso.toFixed(1)} kg</p>
-                            </div>
-                          )}
-                          {rec.gorduraCorporal != null && (
-                            <div>
-                              <p className="text-xs text-muted-foreground">Gordura</p>
-                              <p className="font-semibold">{rec.gorduraCorporal.toFixed(1)}%</p>
-                            </div>
-                          )}
-                          {rec.massaMuscular != null && (
-                            <div>
-                              <p className="text-xs text-muted-foreground">Músculo</p>
-                              <p className="font-semibold">{rec.massaMuscular.toFixed(1)} kg</p>
-                            </div>
-                          )}
-                          {rec.imc != null && (
-                            <div>
-                              <p className="text-xs text-muted-foreground">IMC</p>
-                              <p className="font-semibold">{rec.imc.toFixed(1)}</p>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
+                ) : bioRecords.length === 0 ? (
                   <div className="text-center py-12 border-2 border-dashed rounded-xl bg-secondary/20">
                     <Scale size={32} className="mx-auto text-muted-foreground mb-3 opacity-50"/>
                     <p className="text-muted-foreground mb-4">Nenhum registro de bioimpedância para este paciente.</p>
@@ -272,6 +309,51 @@ export default function PatientDetail() {
                         <Plus size={16} className="mr-2"/> Adicionar Primeiro Registro
                       </Button>
                     </Link>
+                  </div>
+                ) : (
+                  <div className="space-y-5">
+                    {latest && (
+                      <div>
+                        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">
+                          Última medição — {format(new Date(latest.dataBio + "T12:00:00"), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+                        </p>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                          {METRICS.map(m => {
+                            const val = latest[m.key] as number | null;
+                            if (val === null) return null;
+                            return (
+                              <div key={m.key} className="rounded-xl border border-border/60 bg-card p-3">
+                                <div className="flex items-center justify-between mb-1">
+                                  <p className="text-xs text-muted-foreground">{m.label}</p>
+                                  <Trend current={val} previous={previous ? previous[m.key] as number | null : null} />
+                                </div>
+                                <p className="text-lg font-bold" style={{ color: m.color }}>
+                                  {Number(val).toFixed(m.decimals ?? 1)}
+                                  <span className="text-xs font-normal text-muted-foreground ml-1">{m.unit}</span>
+                                </p>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
+                    {chartsWithData.length > 0 && (
+                      <div>
+                        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">Evolução ao longo do tempo</p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          {chartsWithData.map(m => (
+                            <MetricChart key={m.key} metric={m} records={bioRecords} />
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {bioRecords.length > 1 && chartsWithData.length === 0 && (
+                      <p className="text-xs text-muted-foreground text-center py-4">
+                        Adicione pelo menos 2 registros com a mesma métrica para ver os gráficos de evolução.
+                      </p>
+                    )}
                   </div>
                 )}
               </TabsContent>
