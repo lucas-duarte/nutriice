@@ -1,13 +1,25 @@
 import { useRoute } from "wouter";
 import { Link } from "wouter";
+import { useEffect, useState } from "react";
 import { useGetPatient, useListPatientDiets, useListAppointments } from "@workspace/api-client-react";
-import { getAuthOptions } from "@/lib/api-helpers";
+import { getAuthOptions, getAuthReq } from "@/lib/api-helpers";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Edit, Plus, Calendar, Activity, Apple, Loader2 } from "lucide-react";
+import { ArrowLeft, Edit, Plus, Calendar, Activity, Apple, Loader2, BarChart2, Scale } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+
+const BASE = import.meta.env.BASE_URL?.replace(/\/$/, "") || "";
+
+interface BioRecord {
+  id: number;
+  recordedAt: string;
+  weight: string | null;
+  bodyFatPercent: string | null;
+  muscleMassKg: string | null;
+  bmi: string | null;
+}
 
 export default function PatientDetail() {
   const [, params] = useRoute("/patients/:id");
@@ -16,6 +28,19 @@ export default function PatientDetail() {
   const { data: patient, isLoading: isPatientLoading } = useGetPatient(id, getAuthOptions());
   const { data: diets, isLoading: isDietsLoading } = useListPatientDiets(id, getAuthOptions());
   const { data: appointments, isLoading: isApptsLoading } = useListAppointments({ patientId: id }, getAuthOptions());
+
+  const [bioRecords, setBioRecords] = useState<BioRecord[]>([]);
+  const [isBioLoading, setIsBioLoading] = useState(false);
+
+  useEffect(() => {
+    if (!id) return;
+    setIsBioLoading(true);
+    fetch(`${BASE}/api/patients/${id}/bioimpedance`, getAuthReq())
+      .then(r => r.ok ? r.json() : [])
+      .then(data => setBioRecords(data))
+      .catch(() => setBioRecords([]))
+      .finally(() => setIsBioLoading(false));
+  }, [id]);
 
   if (isPatientLoading) return <div className="p-12 text-center">Carregando dados do paciente...</div>;
   if (!patient) return <div className="p-12 text-center text-destructive">Paciente não encontrado.</div>;
@@ -78,15 +103,11 @@ export default function PatientDetail() {
           <Tabs defaultValue="diets" className="w-full">
             <CardHeader className="border-b px-6 py-4">
               <div className="flex items-center justify-between gap-4">
-                <TabsList className="grid w-[400px] grid-cols-2 bg-secondary rounded-xl p-1">
+                <TabsList className="grid w-full max-w-[560px] grid-cols-3 bg-secondary rounded-xl p-1">
                   <TabsTrigger value="diets" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">Planos Alimentares</TabsTrigger>
                   <TabsTrigger value="appointments" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">Consultas</TabsTrigger>
+                  <TabsTrigger value="bioimpedance" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">Bioimpedância</TabsTrigger>
                 </TabsList>
-                <Link href={`/patients/${patient.id}/dashboard`}>
-                  <Button variant="outline" size="sm" className="rounded-xl border-primary/40 text-primary hover:bg-primary/5 whitespace-nowrap">
-                    <Activity size={15} className="mr-2" /> Bioimpedância
-                  </Button>
-                </Link>
               </div>
             </CardHeader>
             <CardContent className="p-6 min-h-[400px]">
@@ -174,6 +195,86 @@ export default function PatientDetail() {
                 ) : (
                   <div className="text-center py-12 border-2 border-dashed rounded-xl bg-secondary/20">
                     <p className="text-muted-foreground">Nenhuma consulta agendada.</p>
+                  </div>
+                )}
+              </TabsContent>
+
+              <TabsContent value="bioimpedance" className="mt-0 outline-none">
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="text-xl font-semibold flex items-center gap-2">
+                    <Scale size={20} className="text-violet-500"/> Bioimpedância
+                  </h3>
+                  <div className="flex gap-2">
+                    <Link href={`/patients/${patient.id}/dashboard`}>
+                      <Button size="sm" variant="outline" className="rounded-xl border-violet-300 text-violet-700 hover:bg-violet-50">
+                        <BarChart2 size={15} className="mr-2"/> Ver Gráficos
+                      </Button>
+                    </Link>
+                    <Link href={`/patients/${patient.id}/bioimpedance/new`}>
+                      <Button size="sm" className="rounded-xl bg-violet-600 hover:bg-violet-700 shadow-sm">
+                        <Plus size={16} className="mr-2"/> Novo Registro
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+
+                {isBioLoading ? (
+                  <div className="py-8 text-center"><Loader2 className="animate-spin mx-auto text-violet-500" /></div>
+                ) : bioRecords.length > 0 ? (
+                  <div className="space-y-3">
+                    {bioRecords.map(rec => (
+                      <div key={rec.id} className="border rounded-xl p-4 flex justify-between items-center bg-card hover:border-violet-200 hover:shadow-sm transition-all">
+                        <div className="flex items-center gap-3">
+                          <div className="w-9 h-9 rounded-full bg-violet-100 flex items-center justify-center">
+                            <Scale size={16} className="text-violet-600"/>
+                          </div>
+                          <div>
+                            <p className="font-semibold text-foreground">
+                              {format(new Date(rec.recordedAt), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-0.5">
+                              {format(new Date(rec.recordedAt), "HH:mm")}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex gap-6 text-sm text-right">
+                          {rec.weight && (
+                            <div>
+                              <p className="text-xs text-muted-foreground">Peso</p>
+                              <p className="font-semibold">{parseFloat(rec.weight).toFixed(1)} kg</p>
+                            </div>
+                          )}
+                          {rec.bodyFatPercent && (
+                            <div>
+                              <p className="text-xs text-muted-foreground">Gordura</p>
+                              <p className="font-semibold">{parseFloat(rec.bodyFatPercent).toFixed(1)}%</p>
+                            </div>
+                          )}
+                          {rec.muscleMassKg && (
+                            <div>
+                              <p className="text-xs text-muted-foreground">Músculo</p>
+                              <p className="font-semibold">{parseFloat(rec.muscleMassKg).toFixed(1)} kg</p>
+                            </div>
+                          )}
+                          {rec.bmi && (
+                            <div>
+                              <p className="text-xs text-muted-foreground">IMC</p>
+                              <p className="font-semibold">{parseFloat(rec.bmi).toFixed(1)}</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12 border-2 border-dashed rounded-xl bg-secondary/20">
+                    <Scale size={32} className="mx-auto text-muted-foreground mb-3 opacity-50"/>
+                    <p className="text-muted-foreground mb-4">Nenhum registro de bioimpedância para este paciente.</p>
+                    <Link href={`/patients/${patient.id}/bioimpedance/new`}>
+                      <Button variant="outline" className="rounded-xl bg-white border-violet-300 text-violet-700">
+                        <Plus size={16} className="mr-2"/> Adicionar Primeiro Registro
+                      </Button>
+                    </Link>
                   </div>
                 )}
               </TabsContent>
