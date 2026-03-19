@@ -71,7 +71,7 @@ export default function BioimpedanceForm() {
       if (!res.ok) throw new Error();
       queryClient.invalidateQueries({ queryKey: ["bioimpedance", patientId] });
       toast({ title: "Medição registrada!", description: "Dados de bioimpedância salvos com sucesso." });
-      navigate(`/patients/${patientId}/dashboard`);
+      navigate(`/patients/${patientId}`);
     } catch {
       toast({ title: "Erro", description: "Falha ao salvar. Verifique os dados.", variant: "destructive" });
     } finally {
@@ -82,7 +82,7 @@ export default function BioimpedanceForm() {
   return (
     <div className="space-y-6 max-w-4xl mx-auto animate-in fade-in duration-300">
       <div className="flex items-center gap-4">
-        <Link href={`/patients/${patientId}/dashboard`}>
+        <Link href={`/patients/${patientId}`}>
           <Button variant="outline" size="icon" className="rounded-xl">
             <ArrowLeft size={18} />
           </Button>
@@ -171,7 +171,7 @@ export default function BioimpedanceForm() {
           </Card>
 
           <div className="md:col-span-2 flex justify-end gap-3">
-            <Link href={`/patients/${patientId}/dashboard`}>
+            <Link href={`/patients/${patientId}`}>
               <Button type="button" variant="outline" className="rounded-xl">Cancelar</Button>
             </Link>
             <Button type="submit" className="rounded-xl shadow-md min-w-[140px]" disabled={isSaving}>

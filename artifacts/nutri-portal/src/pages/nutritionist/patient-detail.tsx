@@ -6,7 +6,7 @@ import { getAuthOptions, getAuthReq } from "@/lib/api-helpers";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Edit, Plus, Calendar, Activity, Apple, Loader2, Scale, TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { ArrowLeft, Edit, Plus, Calendar, Activity, Apple, Loader2, Scale, TrendingUp, TrendingDown, Minus, BarChart2 } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import {
@@ -291,11 +291,18 @@ export default function PatientDetail() {
                   <h3 className="text-xl font-semibold flex items-center gap-2">
                     <Scale size={20} className="text-violet-500"/> Bioimpedância
                   </h3>
-                  <Link href={`/patients/${patient.id}/bioimpedance/new`}>
-                    <Button size="sm" className="rounded-xl bg-violet-600 hover:bg-violet-700 shadow-sm">
-                      <Plus size={16} className="mr-2"/> Novo Registro
-                    </Button>
-                  </Link>
+                  <div className="flex gap-2">
+                    <Link href={`/patients/${patient.id}/dashboard`}>
+                      <Button size="sm" variant="outline" className="rounded-xl border-violet-300 text-violet-700 hover:bg-violet-50">
+                        <BarChart2 size={15} className="mr-1.5"/> Dashboard
+                      </Button>
+                    </Link>
+                    <Link href={`/patients/${patient.id}/bioimpedance/new`}>
+                      <Button size="sm" className="rounded-xl bg-violet-600 hover:bg-violet-700 shadow-sm">
+                        <Plus size={16} className="mr-1.5"/> Novo Registro
+                      </Button>
+                    </Link>
+                  </div>
                 </div>
 
                 {isBioLoading ? (
