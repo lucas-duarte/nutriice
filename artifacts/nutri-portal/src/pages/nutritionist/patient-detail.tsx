@@ -14,11 +14,11 @@ const BASE = import.meta.env.BASE_URL?.replace(/\/$/, "") || "";
 
 interface BioRecord {
   id: number;
-  recordedAt: string;
-  weight: string | null;
-  bodyFatPercent: string | null;
-  muscleMassKg: string | null;
-  bmi: string | null;
+  dataBio: string;
+  peso: number | null;
+  gorduraCorporal: number | null;
+  massaMuscular: number | null;
+  imc: number | null;
 }
 
 export default function PatientDetail() {
@@ -230,36 +230,33 @@ export default function PatientDetail() {
                           </div>
                           <div>
                             <p className="font-semibold text-foreground">
-                              {format(new Date(rec.recordedAt), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
-                            </p>
-                            <p className="text-xs text-muted-foreground mt-0.5">
-                              {format(new Date(rec.recordedAt), "HH:mm")}
+                              {format(new Date(rec.dataBio + "T00:00:00"), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
                             </p>
                           </div>
                         </div>
                         <div className="flex gap-6 text-sm text-right">
-                          {rec.weight && (
+                          {rec.peso != null && (
                             <div>
                               <p className="text-xs text-muted-foreground">Peso</p>
-                              <p className="font-semibold">{parseFloat(rec.weight).toFixed(1)} kg</p>
+                              <p className="font-semibold">{rec.peso.toFixed(1)} kg</p>
                             </div>
                           )}
-                          {rec.bodyFatPercent && (
+                          {rec.gorduraCorporal != null && (
                             <div>
                               <p className="text-xs text-muted-foreground">Gordura</p>
-                              <p className="font-semibold">{parseFloat(rec.bodyFatPercent).toFixed(1)}%</p>
+                              <p className="font-semibold">{rec.gorduraCorporal.toFixed(1)}%</p>
                             </div>
                           )}
-                          {rec.muscleMassKg && (
+                          {rec.massaMuscular != null && (
                             <div>
                               <p className="text-xs text-muted-foreground">Músculo</p>
-                              <p className="font-semibold">{parseFloat(rec.muscleMassKg).toFixed(1)} kg</p>
+                              <p className="font-semibold">{rec.massaMuscular.toFixed(1)} kg</p>
                             </div>
                           )}
-                          {rec.bmi && (
+                          {rec.imc != null && (
                             <div>
                               <p className="text-xs text-muted-foreground">IMC</p>
-                              <p className="font-semibold">{parseFloat(rec.bmi).toFixed(1)}</p>
+                              <p className="font-semibold">{rec.imc.toFixed(1)}</p>
                             </div>
                           )}
                         </div>
