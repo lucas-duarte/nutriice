@@ -162,6 +162,46 @@ router.delete("/diets/:id", requireAuth, requireNutritionist, async (req, res): 
   res.json({ message: "Diet plan deleted" });
 });
 
+router.post("/diets/:id/clone", requireAuth, requireNutritionist, async (req, res): Promise<void> => {
+  const raw = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  const sourceId = parseInt(raw, 10);
+  if (isNaN(sourceId)) { res.status(400).json({ error: "Invalid diet plan ID" }); return; }
+
+  const [source] = await db.select().from(dietPlansTable).where(eq(dietPlansTable.id, sourceId));
+  if (!source) { res.status(404).json({ error: "Diet plan not found" }); return; }
+
+  const targetPatientId = req.body?.patientId ? parseInt(req.body.patientId) : source.patientId;
+  const newName = req.body?.name || `Cópia de ${source.name}`;
+
+  const [newDiet] = await db.insert(dietPlansTable).values({
+    patientId: targetPatientId,
+    name: newName,
+    description: source.description,
+    recommendations: source.recommendations,
+    waterGoalMl: source.waterGoalMl,
+    startDate: null,
+    endDate: null,
+    isActive: false,
+    totalCalories: source.totalCalories,
+  }).returning();
+
+  const meals = await db.select().from(mealsTable).where(eq(mealsTable.dietPlanId, sourceId));
+  if (meals.length > 0) {
+    await db.insert(mealsTable).values(meals.map(m => ({
+      dietPlanId: newDiet.id,
+      name: m.name,
+      time: m.time,
+      description: m.description,
+      foods: m.foods,
+      calories: m.calories,
+      order: m.order,
+      isSupplement: m.isSupplement,
+    })));
+  }
+
+  res.status(201).json(newDiet);
+});
+
 router.get("/diets/:id/meals", requireAuth, async (req, res): Promise<void> => {
   const raw = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
   const id = parseInt(raw, 10);

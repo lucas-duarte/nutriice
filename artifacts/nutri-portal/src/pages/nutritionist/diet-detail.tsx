@@ -1,17 +1,23 @@
-import { useRoute, Link } from "wouter";
+import { useRoute, Link, useLocation } from "wouter";
+import { useState } from "react";
 import { useGetDietPlan, useListDietMeals, useDeleteMeal } from "@workspace/api-client-react";
-import { getAuthOptions } from "@/lib/api-helpers";
+import { getAuthOptions, getAuthReq } from "@/lib/api-helpers";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Plus, Clock, Info, Trash2, Loader2, FileText, Droplets, Pill } from "lucide-react";
+import { ArrowLeft, Plus, Clock, Info, Trash2, Loader2, FileText, Droplets, Pill, Copy } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
+
+const BASE = import.meta.env.BASE_URL?.replace(/\/$/, "") || "";
 
 export default function DietDetail() {
   const [, params] = useRoute("/diets/:id");
   const dietId = parseInt(params?.id || "0");
+  const [, navigate] = useLocation();
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isCloning, setIsCloning] = useState(false);
 
   const { data: diet, isLoading: isDietLoading } = useGetDietPlan(dietId, getAuthOptions());
   const { data: meals, isLoading: isMealsLoading } = useListDietMeals(dietId, getAuthOptions());
@@ -25,6 +31,40 @@ export default function DietDetail() {
       toast({ title: "Removida", description: "Refeição removida com sucesso." });
     } catch (e) {
       toast({ title: "Erro", description: "Falha ao remover refeição.", variant: "destructive" });
+    }
+  };
+
+  const handleDeleteDiet = async () => {
+    if (!confirm(`Excluir o plano "${diet?.name}"? Esta ação não pode ser desfeita e todas as refeições serão removidas.`)) return;
+    setIsDeleting(true);
+    try {
+      const res = await fetch(`${BASE}/api/diets/${dietId}`, { method: "DELETE", ...getAuthReq() });
+      if (!res.ok) throw new Error();
+      toast({ title: "Dieta excluída", description: "O plano alimentar foi removido." });
+      navigate(`/patients/${diet?.patientId}`);
+    } catch {
+      toast({ title: "Erro", description: "Falha ao excluir plano.", variant: "destructive" });
+      setIsDeleting(false);
+    }
+  };
+
+  const handleClone = async () => {
+    setIsCloning(true);
+    try {
+      const res = await fetch(`${BASE}/api/diets/${dietId}/clone`, {
+        method: "POST",
+        ...getAuthReq(),
+        headers: { ...(getAuthReq().headers as Record<string, string>), "Content-Type": "application/json" },
+        body: JSON.stringify({ patientId: diet?.patientId }),
+      });
+      if (!res.ok) throw new Error();
+      const newDiet = await res.json();
+      queryClient.invalidateQueries({ queryKey: [`/api/patients/${diet?.patientId}/diets`] });
+      toast({ title: "Dieta clonada!", description: "Uma cópia foi criada. Você pode editar as refeições agora." });
+      navigate(`/diets/${newDiet.id}`);
+    } catch {
+      toast({ title: "Erro", description: "Falha ao clonar plano.", variant: "destructive" });
+      setIsCloning(false);
     }
   };
 
@@ -50,12 +90,34 @@ export default function DietDetail() {
             <p className="text-muted-foreground mt-1">Total planejado: <strong className="text-foreground">{diet.totalCalories || 0} kcal</strong></p>
           </div>
         </div>
-        <Link href={`/diets/${dietId}/meals/new`}>
-          <Button className="rounded-xl shadow-md bg-primary hover:bg-primary/90 text-white">
-            <Plus size={18} className="mr-2" />
-            Adicionar Refeição
+        <div className="flex gap-2 flex-wrap">
+          <Button
+            variant="outline"
+            size="sm"
+            className="rounded-xl border-violet-300 text-violet-700 hover:bg-violet-50"
+            onClick={handleClone}
+            disabled={isCloning}
+          >
+            {isCloning ? <Loader2 size={15} className="animate-spin mr-1.5" /> : <Copy size={15} className="mr-1.5" />}
+            Clonar Dieta
           </Button>
-        </Link>
+          <Button
+            variant="outline"
+            size="sm"
+            className="rounded-xl border-destructive/40 text-destructive hover:bg-destructive/5"
+            onClick={handleDeleteDiet}
+            disabled={isDeleting}
+          >
+            {isDeleting ? <Loader2 size={15} className="animate-spin mr-1.5" /> : <Trash2 size={15} className="mr-1.5" />}
+            Excluir Dieta
+          </Button>
+          <Link href={`/diets/${dietId}/meals/new`}>
+            <Button className="rounded-xl shadow-md bg-primary hover:bg-primary/90 text-white" size="sm">
+              <Plus size={16} className="mr-2" />
+              Adicionar Refeição
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {diet.description && (

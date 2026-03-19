@@ -1,18 +1,21 @@
+import { useEffect, useState } from "react";
 import { useRoute, useLocation } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useCreateDietPlan, useGetPatient } from "@workspace/api-client-react";
-import { getAuthOptions, extractApiError } from "@/lib/api-helpers";
+import { useCreateDietPlan, useGetPatient, useListPatientDiets } from "@workspace/api-client-react";
+import { getAuthOptions, getAuthReq, extractApiError } from "@/lib/api-helpers";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Loader2, Apple, Droplets, FileText } from "lucide-react";
+import { ArrowLeft, Loader2, Apple, Droplets, FileText, Copy, ChevronDown, ChevronUp } from "lucide-react";
 import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
+
+const BASE = import.meta.env.BASE_URL?.replace(/\/$/, "") || "";
 
 const dietSchema = z.object({
   name: z.string().min(3, "Nome obrigatório"),
@@ -32,14 +35,37 @@ export default function DietForm() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [showClonePanel, setShowClonePanel] = useState(false);
+  const [isCloning, setIsCloning] = useState(false);
 
   const { data: patient } = useGetPatient(patientId, getAuthOptions());
+  const { data: existingDiets = [] } = useListPatientDiets(patientId, getAuthOptions());
   const createMutation = useCreateDietPlan(getAuthOptions());
 
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormValues>({
     resolver: zodResolver(dietSchema),
     defaultValues: { isActive: true }
   });
+
+  const handleClone = async (sourceDietId: number, sourceName: string) => {
+    setIsCloning(true);
+    try {
+      const res = await fetch(`${BASE}/api/diets/${sourceDietId}/clone`, {
+        method: "POST",
+        ...getAuthReq(),
+        headers: { ...(getAuthReq().headers as Record<string, string>), "Content-Type": "application/json" },
+        body: JSON.stringify({ patientId }),
+      });
+      if (!res.ok) throw new Error();
+      const newDiet = await res.json();
+      queryClient.invalidateQueries({ queryKey: [`/api/patients/${patientId}/diets`] });
+      toast({ title: "Dieta clonada!", description: `"Cópia de ${sourceName}" criada com todas as refeições.` });
+      setLocation(`/diets/${newDiet.id}`);
+    } catch {
+      toast({ title: "Erro", description: "Falha ao clonar dieta.", variant: "destructive" });
+      setIsCloning(false);
+    }
+  };
 
   const onSubmit = async (data: FormValues) => {
     try {
@@ -71,6 +97,51 @@ export default function DietForm() {
           <p className="text-muted-foreground">Paciente: <strong className="text-primary">{patient?.name || '...'}</strong></p>
         </div>
       </div>
+
+      {existingDiets.length > 0 && (
+        <Card className="rounded-2xl border-violet-200 bg-violet-50/50 overflow-hidden">
+          <button
+            type="button"
+            className="w-full flex items-center justify-between px-5 py-4 text-left"
+            onClick={() => setShowClonePanel(v => !v)}
+          >
+            <div className="flex items-center gap-2">
+              <Copy size={17} className="text-violet-600" />
+              <span className="font-semibold text-violet-800">Clonar uma dieta existente</span>
+              <span className="text-xs text-violet-500 bg-violet-100 px-2 py-0.5 rounded-full">{existingDiets.length} disponível{existingDiets.length > 1 ? 'is' : ''}</span>
+            </div>
+            {showClonePanel ? <ChevronUp size={16} className="text-violet-500" /> : <ChevronDown size={16} className="text-violet-500" />}
+          </button>
+          {showClonePanel && (
+            <div className="px-5 pb-5 border-t border-violet-100">
+              <p className="text-sm text-violet-700 mt-3 mb-3">Selecione uma dieta para clonar com todas as refeições já incluídas:</p>
+              <div className="space-y-2">
+                {existingDiets.map((diet: any) => (
+                  <div key={diet.id} className="flex items-center justify-between bg-white rounded-xl border border-violet-100 px-4 py-3">
+                    <div>
+                      <p className="font-medium text-foreground text-sm">{diet.name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {diet.meals?.length || 0} refeição{diet.meals?.length !== 1 ? 'ões' : ''} • {diet.totalCalories || 0} kcal
+                        {diet.isActive && <span className="ml-2 text-primary font-medium">• Ativa</span>}
+                      </p>
+                    </div>
+                    <Button
+                      type="button"
+                      size="sm"
+                      className="rounded-xl bg-violet-600 hover:bg-violet-700 text-white ml-3"
+                      disabled={isCloning}
+                      onClick={() => handleClone(diet.id, diet.name)}
+                    >
+                      {isCloning ? <Loader2 size={13} className="animate-spin" /> : <Copy size={13} className="mr-1" />}
+                      Clonar
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </Card>
+      )}
 
       <Card className="p-8 rounded-2xl shadow-sm border-border/50">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
