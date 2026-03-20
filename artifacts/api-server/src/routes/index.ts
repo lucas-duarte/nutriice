@@ -5,6 +5,7 @@ import patientsRouter from "./patients";
 import dietsRouter from "./diets";
 import appointmentsRouter from "./appointments";
 import bioimpedanceRouter from "./bioimpedance";
+import calendarRouter from "./calendar";
 
 const router: IRouter = Router();
 
@@ -14,5 +15,6 @@ router.use(patientsRouter);
 router.use(dietsRouter);
 router.use(appointmentsRouter);
 router.use(bioimpedanceRouter);
+router.use(calendarRouter);
 
 export default router;

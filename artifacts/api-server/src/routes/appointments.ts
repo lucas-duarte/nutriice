@@ -4,6 +4,8 @@ import { appointmentsTable, usersTable, patientsTable } from "@workspace/db";
 import { eq, and } from "drizzle-orm";
 import { requireAuth, requireNutritionist } from "../lib/auth";
 import { CreateAppointmentBody, UpdateAppointmentBody } from "@workspace/api-zod";
+import { google } from "googleapis";
+import { getCalendarClient } from "./calendar";
 
 const router: IRouter = Router();
 
@@ -97,6 +99,40 @@ router.get("/appointments", requireAuth, async (req, res): Promise<void> => {
   res.json(rows);
 });
 
+async function syncAppointmentToCalendar(
+  nutritionistId: number,
+  patientName: string,
+  scheduledAt: Date,
+  durationMinutes: number,
+  notes: string | null,
+  type: string,
+) {
+  try {
+    const result = await getCalendarClient(nutritionistId);
+    if (!result) return;
+    const cal = google.calendar({ version: "v3", auth: result.client });
+    const endAt = new Date(scheduledAt.getTime() + durationMinutes * 60 * 1000);
+    const typeLabel: Record<string, string> = {
+      initial: "Consulta Inicial",
+      followup: "Retorno",
+      online: "Consulta Online",
+      inperson: "Consulta Presencial",
+    };
+    await cal.events.insert({
+      calendarId: "primary",
+      requestBody: {
+        summary: `${typeLabel[type] ?? "Consulta"} — ${patientName}`,
+        description: notes ?? "",
+        start: { dateTime: scheduledAt.toISOString(), timeZone: "America/Sao_Paulo" },
+        end: { dateTime: endAt.toISOString(), timeZone: "America/Sao_Paulo" },
+      },
+      sendUpdates: "none",
+    });
+  } catch (err) {
+    console.error("Falha ao sincronizar com Google Calendar (não crítico):", err);
+  }
+}
+
 router.post("/appointments", requireAuth, requireNutritionist, async (req, res): Promise<void> => {
   const parsed = CreateAppointmentBody.safeParse(req.body);
   if (!parsed.success) {
@@ -105,11 +141,14 @@ router.post("/appointments", requireAuth, requireNutritionist, async (req, res):
   }
 
   const nutritionistId = req.auth!.nutritionistId!;
+  const scheduledAt = new Date(parsed.data.scheduledAt);
+  const durationMinutes = parsed.data.durationMinutes ?? 60;
+
   const [appt] = await db.insert(appointmentsTable).values({
     patientId: parsed.data.patientId,
     nutritionistId,
-    scheduledAt: new Date(parsed.data.scheduledAt),
-    durationMinutes: parsed.data.durationMinutes ?? 60,
+    scheduledAt,
+    durationMinutes,
     status: "pending",
     type: parsed.data.type,
     notes: parsed.data.notes ?? null,
@@ -117,6 +156,17 @@ router.post("/appointments", requireAuth, requireNutritionist, async (req, res):
 
   const row = await getAppointmentWithPatientName(appt.id);
   res.status(201).json(row);
+
+  if (row) {
+    syncAppointmentToCalendar(
+      nutritionistId,
+      row.patientName,
+      scheduledAt,
+      durationMinutes,
+      parsed.data.notes ?? null,
+      parsed.data.type,
+    );
+  }
 });
 
 router.get("/appointments/:id", requireAuth, async (req, res): Promise<void> => {
