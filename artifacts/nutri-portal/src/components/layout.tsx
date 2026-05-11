@@ -10,7 +10,9 @@ import {
   Menu,
   X,
   Apple,
-  Salad
+  Salad,
+  KeyRound,
+  Settings
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -77,6 +79,22 @@ export function DashboardLayout({ children, role }: { children: React.ReactNode,
               <p className="text-xs text-muted-foreground truncate capitalize">{user?.role}</p>
             </div>
           </div>
+          {role === "nutritionist" && (
+            <>
+              <Link href="/settings">
+                <Button variant="ghost" className={`w-full justify-start mb-1 ${location.startsWith("/settings") ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground"}`}>
+                  <Settings size={18} className="mr-2" />
+                  Configurações
+                </Button>
+              </Link>
+              <Link href="/change-password">
+                <Button variant="ghost" className="w-full justify-start text-muted-foreground hover:text-foreground mb-1">
+                  <KeyRound size={18} className="mr-2" />
+                  Alterar senha
+                </Button>
+              </Link>
+            </>
+          )}
           <Button variant="ghost" className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10" onClick={handleLogout}>
             <LogOut size={18} className="mr-2" />
             Sair da conta

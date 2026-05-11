@@ -76,6 +76,27 @@ router.post("/auth/logout", (_req, res): void => {
   res.json({ message: "Logged out successfully" });
 });
 
+router.put("/auth/change-password", requireAuth, async (req, res): Promise<void> => {
+  const { currentPassword, newPassword } = req.body as { currentPassword?: string; newPassword?: string };
+  if (!currentPassword || !newPassword || newPassword.length < 6) {
+    res.status(400).json({ error: "Current and new password (min 6 chars) are required" });
+    return;
+  }
+  const [user] = await db.select().from(usersTable).where(eq(usersTable.id, req.auth!.userId));
+  if (!user) {
+    res.status(404).json({ error: "User not found" });
+    return;
+  }
+  const valid = await comparePassword(currentPassword, user.passwordHash);
+  if (!valid) {
+    res.status(401).json({ error: "Current password is incorrect" });
+    return;
+  }
+  const passwordHash = await hashPassword(newPassword);
+  await db.update(usersTable).set({ passwordHash }).where(eq(usersTable.id, user.id));
+  res.json({ message: "Password updated" });
+});
+
 router.get("/auth/me", requireAuth, async (req, res): Promise<void> => {
   const auth = req.auth!;
   const [user] = await db.select().from(usersTable).where(eq(usersTable.id, auth.userId));

@@ -9,6 +9,8 @@ export const nutritionistsTable = pgTable("nutritionists", {
   crn: text("crn").notNull(),
   phone: text("phone"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  googleAccessToken: text("google_access_token"),
+  googleRefreshToken: text("google_refresh_token"),
 });
 
 export const insertNutritionistSchema = createInsertSchema(nutritionistsTable).omit({ id: true, createdAt: true });

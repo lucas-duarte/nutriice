@@ -198,6 +198,22 @@ router.delete("/patients/:id", requireAuth, requireNutritionist, async (req, res
   res.json({ message: "Patient deleted" });
 });
 
+router.put("/patients/:id/reset-password", requireAuth, requireNutritionist, async (req, res): Promise<void> => {
+  const id = parseInt(req.params.id, 10);
+  if (isNaN(id)) { res.status(400).json({ error: "Invalid patient ID" }); return; }
+  const { newPassword } = req.body as { newPassword?: string };
+  if (!newPassword || newPassword.length < 6) {
+    res.status(400).json({ error: "New password (min 6 chars) required" });
+    return;
+  }
+  const [patient] = await db.select().from(patientsTable)
+    .where(and(eq(patientsTable.id, id), eq(patientsTable.nutritionistId, req.auth!.nutritionistId!)));
+  if (!patient) { res.status(404).json({ error: "Patient not found" }); return; }
+  const passwordHash = await hashPassword(newPassword);
+  await db.update(usersTable).set({ passwordHash }).where(eq(usersTable.id, patient.userId));
+  res.json({ message: "Password reset" });
+});
+
 router.get("/patient/me", requireAuth, async (req, res): Promise<void> => {
   const patientId = req.auth!.patientId;
   if (!patientId) {
